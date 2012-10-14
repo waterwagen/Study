@@ -58,7 +58,8 @@ dependencies {
 				'org.apache.camel:camel-jms:2.10.0',
 				'org.apache.camel:camel-sql:2.10.0',
 				'org.apache.activemq:activemq-core:5.6.0',
-				'org.springframework:spring-jdbc:3.1.2.RELEASE'
+				'org.springframework:spring-jdbc:3.1.2.RELEASE',
+				'org.easytesting:fest-swing:1.2.1'
 	testCompile ('junit:junit:4.+') {transitive = false} // don't want the hamcrest version this pulls in transitively
 	testCompile('org.jmock:jmock:2.5.1') {transitive = false} // don't want the hamcrest version this pulls in transitively
 	groovy 'org.codehaus.groovy:groovy-all:2.0.1'
