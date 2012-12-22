@@ -2,8 +2,9 @@ package com.waterwagen.study.algorithms.sorting;
 
 import java.util.List;
 
-public class QuickSort<T extends Comparable<T>>
+public class QuickSort<T extends Comparable<T>> implements Sort<T>
 {
+	@Override
 	public void sort(List<T> list)
 	{
 		quicksort(list, 0, list.size() - 1);
