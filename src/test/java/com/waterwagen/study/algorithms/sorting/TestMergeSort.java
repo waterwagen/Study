@@ -1,16 +1,10 @@
 package com.waterwagen.study.algorithms.sorting;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-public class TestMergeSort
+public class TestMergeSort extends AbstractSortTest
 {
-
-	@Test
-	public void test()
+	@Override
+	public Sort<Integer> sortInstance()
 	{
-		fail("Not yet implemented");
+		return new MergeSort<Integer>();
 	}
-
 }
