@@ -9,6 +9,6 @@ public abstract class ListDataAlgorithmExecutor implements AlgorithmExecutor
 {
 	List<Integer> buildListOfIntegers(int n)
 	{
-		return new ArrayList<Integer>(Utilities.randomCollectionOfIntsUpTo(n, n*2));
+		return new ArrayList<Integer>(Utilities.randomCollectionOfInts(n, n*2));
 	}
 }

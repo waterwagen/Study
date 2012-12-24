@@ -6,12 +6,12 @@ import java.util.Random;
 
 public class Utilities
 {
-	public static Collection<Integer> randomCollectionOfIntsUpTo(int num_ints)
+	public static Collection<Integer> randomCollectionOfInts(int num_ints)
 	{
-		return randomCollectionOfIntsUpTo(num_ints, num_ints);
+		return randomCollectionOfInts(num_ints, num_ints);
 	}
 	
-	public static Collection<Integer> randomCollectionOfIntsUpTo(int num_ints, int maximum_value)
+	public static Collection<Integer> randomCollectionOfInts(int num_ints, int maximum_value)
 	{
 		Collection<Integer> result = new ArrayList<>();
 		

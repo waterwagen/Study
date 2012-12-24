@@ -22,7 +22,7 @@ public abstract class AbstractSortTest
 	@Before
 	public void setUp()
 	{
-		list = new ArrayList<>(Utilities.randomCollectionOfIntsUpTo(NUM_COUNT));
+		list = new ArrayList<>(Utilities.randomCollectionOfInts(NUM_COUNT));
 		sort = sortInstance();
 	}
 	

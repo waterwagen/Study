@@ -32,7 +32,7 @@ public class Sandbox
 	{
 		StringBuilder result = new StringBuilder();
 		
-		Collection<Integer> ints = Utilities.randomCollectionOfIntsUpTo(num_ints);
+		Collection<Integer> ints = Utilities.randomCollectionOfInts(num_ints);
 		for(Integer next_int : ints)
 			result.append(next_int).append("\n");
 		
