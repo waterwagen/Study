@@ -35,31 +35,20 @@ public class MergeSort<T extends Comparable<T>> implements Sort<T>
 		int length1 = high1 - low1 + 1;
 		int length2 = high2 - low2 + 1;
 		@SuppressWarnings("unchecked") T[] helper = (T[])new Comparable[length1 + length2];
-		int merge_pointer = 0;
-		int one_pointer = low1;
-		int two_pointer = low2;
-		while(merge_pointer < helper.length)
+		for(int index = 0; index < helper.length; index++)
+			helper[index] = list.get(low1 + index);
+		
+		int merge_pointer = low1;
+		int pointer_one = 0;
+		int pointer_two = low2 - low1;
+		while(pointer_one < (low2 - low1) && pointer_two < helper.length)
 		{
-			int lowest_value_index;
-			if(one_pointer <= high1)
-				if(two_pointer <= high2)
-				{
-					int compare_result = list.get(one_pointer).compareTo(list.get(two_pointer));
-					lowest_value_index = compare_result < 1 ? one_pointer++ : two_pointer++;
-				}
-				else
-					lowest_value_index = one_pointer++;
-			else
-				lowest_value_index = two_pointer++;
-			helper[merge_pointer] = list.get(lowest_value_index);
+			int compare_result = helper[pointer_one].compareTo(helper[pointer_two]);
+			int lowest_value_index = compare_result <= 0 ? pointer_one++ : pointer_two++;
+			list.set(merge_pointer, helper[lowest_value_index]);
 			merge_pointer++;
 		}
-		copy(helper, list, low1);
-	}
-
-	private void copy(T[] helper, List<T> list, int insertion_point)
-	{
-		for(int index = 0; index < helper.length; index++)
-			list.set(insertion_point + index, helper[index]);
+		while(pointer_one < (low2 - low1))
+			list.set(merge_pointer++, helper[pointer_one++]);
 	}
 }
