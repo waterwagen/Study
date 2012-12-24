@@ -14,15 +14,13 @@ import com.waterwagen.Utilities;
 
 public abstract class AbstractSortTest
 {
-	private static final int NUM_COUNT = 1_000_000;
-	
 	private Sort<Integer> sort;
 	private List<Integer> list;
 	
 	@Before
 	public void setUp()
 	{
-		list = new ArrayList<>(Utilities.randomCollectionOfInts(NUM_COUNT));
+		list = new ArrayList<>(Utilities.randomCollectionOfInts(numberCount()));
 		sort = sortInstance();
 	}
 	
@@ -54,5 +52,10 @@ public abstract class AbstractSortTest
 		assertThat(in_asc_order, equalTo(true));
 	}
 
+	int numberCount() 
+	{
+		return 1_000_000;
+	}
+	
 	public abstract Sort<Integer> sortInstance();
 }
