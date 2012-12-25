@@ -6,6 +6,7 @@ public class DoublingRatioRunner
 	{
 //		AlgorithmExecutor executor = new QuickSortExecutor();
 		AlgorithmExecutor executor = new MergeSortExecutor();
+//		AlgorithmExecutor executor = new BubbleSortExecutor();
 //		AlgorithmExecutor executor = new BinarySearchExecutor();
 		DoublingRatioFinder.run(executor);
 	}
