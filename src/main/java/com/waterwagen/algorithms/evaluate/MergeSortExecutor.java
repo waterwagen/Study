@@ -1,4 +1,4 @@
-package com.waterwagen.algorithms;
+package com.waterwagen.algorithms.evaluate;
 
 import java.util.List;
 

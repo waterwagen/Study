@@ -1,4 +1,4 @@
-package com.waterwagen.algorithms;
+package com.waterwagen.algorithms.evaluate;
 
 /**
  *  <i>Stopwatch</i>. This class is a data type for measuring
