@@ -2,10 +2,10 @@ package com.waterwagen.algorithms.evaluate.implementations.searches;
 
 import java.util.List;
 
-import com.waterwagen.algorithms.evaluate.implementations.ListDataAlgorithmExecutor;
+import com.waterwagen.algorithms.evaluate.implementations.DataAlgorithmExecutor;
 import com.waterwagen.study.algorithms.searching.BinarySearch;
 
-public class BinarySearchExecutor extends ListDataAlgorithmExecutor
+public class BinarySearchExecutor extends DataAlgorithmExecutor
 {
 	private BinarySearch<Integer> mSearch;
 	private List<Integer> mList;
@@ -19,7 +19,7 @@ public class BinarySearchExecutor extends ListDataAlgorithmExecutor
 	@Override
 	public void prepare(int n)
 	{
-		mList = buildListOfIntegers(n);
+		mList = buildListOfRandomIntegers(n, n*2);
 //		Random random_gen = new Random(System.currentTimeMillis());
 		mTargetValue = mList.get(0);
 	}

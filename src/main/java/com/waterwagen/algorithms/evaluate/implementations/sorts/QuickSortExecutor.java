@@ -2,10 +2,10 @@ package com.waterwagen.algorithms.evaluate.implementations.sorts;
 
 import java.util.List;
 
-import com.waterwagen.algorithms.evaluate.implementations.ListDataAlgorithmExecutor;
+import com.waterwagen.algorithms.evaluate.implementations.DataAlgorithmExecutor;
 import com.waterwagen.study.algorithms.sorting.QuickSort;
 
-public class QuickSortExecutor extends ListDataAlgorithmExecutor
+public class QuickSortExecutor extends DataAlgorithmExecutor
 {
 	private final QuickSort<Integer> mSort;
 	private List<Integer> mList;
@@ -18,7 +18,7 @@ public class QuickSortExecutor extends ListDataAlgorithmExecutor
 	@Override
 	public void prepare(int n)
 	{
-		mList = buildListOfIntegers(n);
+		mList = buildListOfRandomIntegers(n, n*2);
 	}
 	
 	@Override
