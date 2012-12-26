@@ -17,27 +17,21 @@ package com.waterwagen.algorithms.evaluate;
  *
  *************************************************************************/
 
-public abstract class DoublingRatioFinder {
-
-    // time ThreeSum.count() for N random 6-digit ints
-//    public static double timeTrial(int N) {
-//        int MAX = 1000000;
-//        int[] a = new int[N];
-//        for (int i = 0; i < N; i++) {
-//            a[i] = StdRandom.uniform(-MAX, MAX);
-//        }
-//        Stopwatch timer = new Stopwatch();
-//        int cnt = ThreeSum.count(a);
-//        return timer.elapsedTime();
-//    }
+public abstract class DoublingRatioFinder 
+{
+	private static int RUN_COUNT = 10;
 
 	public static void run(AlgorithmExecutor executor)
 	{
         double prev = timeTrial(125, executor);
-        for (int N = 250; true; N += N) {
-            double time = timeTrial(N, executor);
-            StdOut.printf("%6d %7.1f %5.1f\n", N, time, time/prev);
-            prev = time;
+        for (int N = 250; true; N += N) 
+        {
+        	double N_total_time = 0;
+        	for(int i = 0; i < RUN_COUNT; i++)
+        		N_total_time += timeTrial(N, executor);
+        	double avg_time = N_total_time/RUN_COUNT;
+            StdOut.printf("%6d %7.4f %5.1f\n", N, avg_time, avg_time/prev);
+            prev = avg_time;
         } 
 	}
 
