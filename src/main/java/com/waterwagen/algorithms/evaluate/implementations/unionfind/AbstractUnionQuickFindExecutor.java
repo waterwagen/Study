@@ -1,8 +1,9 @@
-package com.waterwagen.algorithms.evaluate;
+package com.waterwagen.algorithms.evaluate.implementations.unionfind;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import com.waterwagen.algorithms.evaluate.AlgorithmExecutor;
 import com.waterwagen.study.algorithms.other.UnionQuickFind;
 
 public abstract class AbstractUnionQuickFindExecutor implements AlgorithmExecutor

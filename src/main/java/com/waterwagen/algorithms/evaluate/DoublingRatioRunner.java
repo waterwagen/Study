@@ -1,5 +1,7 @@
 package com.waterwagen.algorithms.evaluate;
 
+import com.waterwagen.algorithms.evaluate.implementations.unionfind.UnionQuickFindExecutorForUnionMsg;
+
 public class DoublingRatioRunner
 {
 	public static void main(String[] argv)

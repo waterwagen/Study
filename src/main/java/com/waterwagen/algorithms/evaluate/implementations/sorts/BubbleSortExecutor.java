@@ -1,7 +1,8 @@
-package com.waterwagen.algorithms.evaluate;
+package com.waterwagen.algorithms.evaluate.implementations.sorts;
 
 import java.util.List;
 
+import com.waterwagen.algorithms.evaluate.implementations.ListDataAlgorithmExecutor;
 import com.waterwagen.study.algorithms.sorting.BubbleSort;
 
 public class BubbleSortExecutor extends ListDataAlgorithmExecutor

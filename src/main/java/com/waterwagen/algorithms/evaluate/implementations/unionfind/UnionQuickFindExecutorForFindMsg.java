@@ -1,4 +1,4 @@
-package com.waterwagen.algorithms.evaluate;
+package com.waterwagen.algorithms.evaluate.implementations.unionfind;
 
 public class UnionQuickFindExecutorForFindMsg extends AbstractUnionQuickFindExecutor
 {
