@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.waterwagen.algorithms.evaluate.implementations.DataAlgorithmExecutor;
-import com.waterwagen.study.algorithms.other.UnionQuickFind;
+import com.waterwagen.study.algorithms.other.UnionFind;
 
-public abstract class AbstractUnionQuickFindExecutor extends DataAlgorithmExecutor
+public abstract class AbstractUnionFindExecutor extends DataAlgorithmExecutor
 {
-	UnionQuickFind mUnionQuickFind;
+	UnionFind mUnionFind;
 	Set<Integer> mSiteIds = new HashSet<>();
 
 	@Override
@@ -16,6 +16,8 @@ public abstract class AbstractUnionQuickFindExecutor extends DataAlgorithmExecut
 	{
 		mSiteIds.clear();
 		mSiteIds.addAll(buildSetOfOrderedIntegersUpTo(n));
-		mUnionQuickFind = new UnionQuickFind(mSiteIds);
+		mUnionFind = newUnionFindInstance(mSiteIds);
 	}
+
+	protected abstract UnionFind newUnionFindInstance(Set<Integer> site_ids);
 }

@@ -2,7 +2,7 @@ package com.waterwagen.algorithms.evaluate.implementations.unionfind;
 
 import java.util.Iterator;
 
-public class UnionQuickFindExecutorForUnionMsg extends AbstractUnionQuickFindExecutor
+public abstract class UnionFindExecutorForConnectedMsg extends AbstractUnionFindExecutor
 {
 	private int mSiteId1;
 	private int mSiteId2;
@@ -19,6 +19,6 @@ public class UnionQuickFindExecutorForUnionMsg extends AbstractUnionQuickFindExe
 	@Override
 	public void execute()
 	{
-		mUnionQuickFind.union(mSiteId1, mSiteId2);
+		mUnionFind.connected(mSiteId1, mSiteId2);
 	}
 }

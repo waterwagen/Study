@@ -1,6 +1,6 @@
 package com.waterwagen.algorithms.evaluate.implementations.unionfind;
 
-public class UnionQuickFindExecutorForFindMsg extends AbstractUnionQuickFindExecutor
+public abstract class UnionFindExecutorForFindMsg extends AbstractUnionFindExecutor
 {
 	private int mSiteId;
 
@@ -14,6 +14,6 @@ public class UnionQuickFindExecutorForFindMsg extends AbstractUnionQuickFindExec
 	@Override
 	public void execute()
 	{
-		mUnionQuickFind.find(mSiteId);
+		mUnionFind.find(mSiteId);
 	}
 }
