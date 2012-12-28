@@ -38,7 +38,7 @@ public abstract class TestUnionFind
 	/////////////
 	
 	@Test
-	public void testFindBeforeConnectionReturnsComponentNameSameAsSiteId()
+	public void testFindBeforeUnionReturnsComponentNameSameAsSiteId()
 	{
 		for(int i = 0; i < mSiteIdList.size(); i++)
 		{
@@ -47,6 +47,32 @@ public abstract class TestUnionFind
 		}
 	}
 
+	@Test
+	public void testFindAfterUnionReturnsSameComponentForEachSiteId()
+	{
+		int site1 = mSiteIdList.get(0);
+		int site2 = mSiteIdList.get(1);
+		mUnionFind.union(site1, site2);
+		
+		assertThat(mUnionFind.find(site1), equalTo(mUnionFind.find(site2)));
+	}
+
+	@Test
+	public void testFindReturnsSameComponentAfterEachSubsequentUnionCall()
+	{
+		int site1 = mSiteIdList.get(0);
+		int site2 = mSiteIdList.get(1);
+		mUnionFind.union(site1, site2);
+		int component = mUnionFind.find(site1);
+
+		for(int counter = 1; counter <= 10; counter++)
+		{
+			mUnionFind.union(site1, site2);
+			assertThat(mUnionFind.find(site1), equalTo(component));
+			assertThat(mUnionFind.find(site2), equalTo(component));
+		}
+	}
+	
 	@Test
 	public void testFindThrowsExceptionOnSearchForNonExistentSite()
 	{
