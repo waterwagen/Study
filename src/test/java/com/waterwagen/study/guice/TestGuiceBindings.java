@@ -204,13 +204,11 @@ public class TestGuiceBindings
 		
 		Injector injector = Guice.createInjector(new AbstractModule()
 		{
-			@SuppressWarnings("unused")
 			@Provides
 			protected TestService provideTestService(@TestAnno String test_param)
 			{
 				return new TestServiceImpl(test_param);
 			}
-			@SuppressWarnings("unused")
 			@Provides
 			protected ParentClass provideParentClass(@TestAnno String test_param)
 			{

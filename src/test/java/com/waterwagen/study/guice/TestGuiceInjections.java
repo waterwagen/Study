@@ -164,7 +164,6 @@ public class TestGuiceInjections
 			return this.mString;
 		}
 		
-		@SuppressWarnings("unused")
 		@Inject
 		private void setString(String string)
 		{
@@ -181,7 +180,6 @@ public class TestGuiceInjections
 			return this.mString;
 		}
 		
-		@SuppressWarnings("unused")
 		@Inject(optional=true)
 		private void setString(@Named(OPTIONALTEST_ANNO_NAME) String string)
 		{
@@ -236,14 +234,12 @@ public class TestGuiceInjections
 			return this.mObjTwo;
 		}
 
-		@SuppressWarnings("unused")
 		@Inject
 		private void setObjOne(String one)
 		{
 			mObjOne = one;
 		}
 
-		@SuppressWarnings("unused")
 		@Inject
 		private void setObjTwo(List<String> two)
 		{

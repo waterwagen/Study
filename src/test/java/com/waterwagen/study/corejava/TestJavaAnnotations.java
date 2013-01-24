@@ -20,27 +20,21 @@ public class TestJavaAnnotations
 	private static class Parent {}
 	private static class Child extends Parent {}
 
-	@SuppressWarnings("unused")
 	@FieldAndMethodOnlyAnnotation
 	private String mFieldAndMethodOnlyAnnoTarget = "";
 
-	@SuppressWarnings("unused")
 	@JavadocdAnnotation
 	private String mJavadocdAnnoTarget = "";
 
-	@SuppressWarnings("unused")
 	@SingleMemberAnno("this is a value")
 	private String mSingleMemberAnnoTarget = "";
 
-	@SuppressWarnings("unused")
 	@MarkerAnno
 	private String mMarkerAnnoTarget = "";
 
-	@SuppressWarnings("unused")
 	@MyAnnoSource(name="Source Anno")
 	private String mSourceAnnoTarget = "";
 	
-	@SuppressWarnings("unused")
 	@MyAnnoRuntime(name="Runtime Anno")
 	private String mRuntimeAnnoTarget = "";
 
