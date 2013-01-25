@@ -123,6 +123,7 @@ public class TestCamelSandbox
 	}
 	
 	@Test
+	@Ignore // needs to have a DB with a specific schema installed locally to work
 	public void testJmsToDbInsertDataRouteSeqPKIncrement() throws Exception
 	{
 		// Camel endpoint names
@@ -166,6 +167,7 @@ public class TestCamelSandbox
 	}
 	
 	@Test
+	@Ignore // needs to have a DB with a specific schema installed locally to work
 	public void testJmsToDbInsertDataRouteManualPKIncrement() throws Exception
 	{
 		// utility variables
@@ -223,6 +225,7 @@ public class TestCamelSandbox
 	}
 	
 	@Test
+	@Ignore // needs to have a DB with a specific schema installed locally to work
 	public void testJmsToDbRequestDataRoute() throws Exception
 	{
 		// some utility variables
