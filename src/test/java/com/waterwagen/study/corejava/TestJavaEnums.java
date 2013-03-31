@@ -30,6 +30,14 @@ public class TestJavaEnums
 						"This is an orange string value.", fruit.stringValue());
 	}
 	
+	@Test
+	public void testConvertingFromStringToEnum()
+	{
+		assertEquals(Fruit.valueOf("APPLE"), Fruit.APPLE);
+		assertEquals(Fruit.valueOf("BANANA"), Fruit.BANANA);
+		assertEquals(Fruit.valueOf("ORANGE"), Fruit.ORANGE);
+	}
+	
 	private static enum Fruit
 	{
 		APPLE (1.25, "A red, sweet, round fruit.")
