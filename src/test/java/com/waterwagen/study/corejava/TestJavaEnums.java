@@ -16,7 +16,7 @@ public class TestJavaEnums
 		assertEquals("Unexpected fruit description.", "A red, sweet, round fruit.", fruit.getDescription());
 		assertEquals("Unexpected string value. Each fruit should have overriden the stringValue() method.", 
 						"This is an apple string value.", fruit.stringValue());
-
+		
 		fruit = Fruit.BANANA;
 		assertEquals("Unexpected fruit price.", Double.valueOf(0.99), fruit.getPrice());
 		assertEquals("Unexpected fruit description.", "A yellow, tube-shaped fruit.", fruit.getDescription());
@@ -35,7 +35,9 @@ public class TestJavaEnums
 		APPLE (1.25, "A red, sweet, round fruit.")
 		{
 			@Override
-			protected String stringValue() { return "This is an apple string value."; }
+			protected String stringValue() { thisIsAnAppleMethod(); return "This is an apple string value."; }
+			
+			void thisIsAnAppleMethod() {}
 		},
 		BANANA (0.99, "A yellow, tube-shaped fruit.")
 		{
