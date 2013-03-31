@@ -7,25 +7,37 @@ import org.junit.Test;
 public class TestJavaEnums
 {
 	@Test
-	public void testEnumBasics()
+	public void testEnumConstructorValues()
 	{
 		Fruit fruit;
 		
 		fruit = Fruit.APPLE;
 		assertEquals("Unexpected fruit price.", Double.valueOf(1.25), fruit.getPrice());
 		assertEquals("Unexpected fruit description.", "A red, sweet, round fruit.", fruit.getDescription());
-		assertEquals("Unexpected string value. Each fruit should have overriden the stringValue() method.", 
-						"This is an apple string value.", fruit.stringValue());
 		
 		fruit = Fruit.BANANA;
 		assertEquals("Unexpected fruit price.", Double.valueOf(0.99), fruit.getPrice());
 		assertEquals("Unexpected fruit description.", "A yellow, tube-shaped fruit.", fruit.getDescription());
-		assertEquals("Unexpected string value. Each fruit should have overriden the stringValue() method.", 
-						"This is a banana string value.", fruit.stringValue());		
 		
 		fruit = Fruit.ORANGE;
 		assertEquals("Unexpected fruit price.", Double.valueOf(1.45), fruit.getPrice());
 		assertEquals("Unexpected fruit description.", "An orange, sweet, juicy, round fruit.", fruit.getDescription());
+	}
+	
+	@Test
+	public void testEnumMethodOverriding()
+	{
+		Fruit fruit;
+		
+		fruit = Fruit.APPLE;
+		assertEquals("Unexpected string value. Each fruit should have overriden the stringValue() method.", 
+						"This is an apple string value.", fruit.stringValue());
+		
+		fruit = Fruit.BANANA;
+		assertEquals("Unexpected string value. Each fruit should have overriden the stringValue() method.", 
+						"This is a banana string value.", fruit.stringValue());		
+		
+		fruit = Fruit.ORANGE;
 		assertEquals("Unexpected string value. Each fruit should have overriden the stringValue() method.", 
 						"This is an orange string value.", fruit.stringValue());
 	}
