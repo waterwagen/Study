@@ -59,10 +59,13 @@ class TestHibernateBasics
 		// verify result
 		def result = db.rows('select * from HIBERNATE_TEST_EVENTS')
 		assert result.size == 2
-		// row 1
+		// id column
+		assert result[0]['ID'] == 1
+		assert result[1]['ID'] == 2
+		// message string column
 		assert result[0]['TEST_MESSAGE'] == test_message_1
 		assert result[1]['TEST_MESSAGE'] == test_message_2
-		// row 2
+		// timestamp column
 //		assert result[0]['TEST_TIMESTAMP'] == timestamp_1
 //		assert result[1]['TEST_TIMESTAMP'] == timestamp_2	
 	}
