@@ -17,7 +17,7 @@ import static com.waterwagen.Utilities.uncheckedRunnable;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class Java8ImpatientLambdasChapterExercises {
+public class Java8ImpatientLambdasChapter1Exercises {
 
   private static final String LAMBDA_EXERCISES_ROOT_DIRECTORY = "./src/test/resources/lambdaExercises";
 
