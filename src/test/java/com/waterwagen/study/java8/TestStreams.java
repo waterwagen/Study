@@ -1,11 +1,14 @@
 package com.waterwagen.study.java8;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.waterwagen.Utilities;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +39,7 @@ public class TestStreams {
     assertEquals(16, sumOfEvens);
     System.out.println(String.format("sum of evens (reduced only) from %s is %s", nums, sumOfEvens));
 
-    sumOfEvens = nums.stream().filter(this::isIntegerEven).reduce(0, this::addIntegers);
+    sumOfEvens = nums.stream().filter(this::isIntegerEven).reduce(0, Math::addExact);
     assertEquals(16, sumOfEvens);
     System.out.println(String.format("sum of evens (reduced & filtered) from %s is %s", nums, sumOfEvens));
 
@@ -44,7 +47,7 @@ public class TestStreams {
     assertEquals(16, sumOfEvens);
     System.out.println(String.format("sum of evens (reduced & collected) from %s is %s", nums, sumOfEvens));
 
-    int sumOfWordLengths = words.stream().reduce(0, (total,element) -> total + element.length(), this::addIntegers);
+    int sumOfWordLengths = words.stream().reduce(0, (total,element) -> total + element.length(), Math::addExact);
     assertEquals(21, sumOfWordLengths);
     System.out.println(String.format("sum of word lengths (reduced[complex form]) from %s is %s",
                                      words,
@@ -57,12 +60,63 @@ public class TestStreams {
                                      sumOfWordLengths));
   }
 
+  @Test
+  public void testLinearVsParallelProcessingTime() {
+    Set<String> largeSetOfWords = new WordSetGenerator().withSetSize(100000000).generate();
+
+    // linear
+    TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+    double avgMillisElapsed = Utilities.calculateAverageRuntime(() ->
+      largeSetOfWords.stream().mapToInt(String::length).sum(),
+      timeUnit);
+    printElapsedTime(avgMillisElapsed, timeUnit, "linear");
+
+    // parallel
+    avgMillisElapsed = Utilities.calculateAverageRuntime(() ->
+      largeSetOfWords.stream().parallel().mapToInt(String::length).sum(),
+      timeUnit);
+    printElapsedTime(avgMillisElapsed, timeUnit, "parallel");
+  }
+
+  private void printElapsedTime(Double timeElapsed,
+                                TimeUnit timeUnit,
+                                String qualifier) {
+    System.out.println(
+        String.format("elapsed time to calculate total words length (%s): %f %s", qualifier, timeElapsed, timeUnit));
+  }
+
   private boolean isIntegerEven(Integer element) {
     return element % 2 == 0;
   }
 
-  private Integer addIntegers(Integer first, Integer second) {
-    return first + second;
-  }
+  private class WordSetGenerator {
 
+//    private Optional<Integer> wordLength = Optional.of(4);
+
+    private Optional<Integer> setSize = Optional.empty();
+
+//    public WordSetGenerator withWordLength(int wordLength) {
+//      this.wordLength = Optional.of(wordLength);
+//      return this;
+//    }
+
+    public WordSetGenerator withSetSize(int setSize) {
+      this.setSize = Optional.of(setSize);
+      return this;
+    }
+
+    public Set<String> generate() {
+//      if(wordLength.isPresent() && setSize.isPresent()) {
+      if(setSize.isPresent()) {
+        Random randomNumberGenerator = new Random(System.currentTimeMillis());
+        String word = StringUtils.repeat("a", randomNumberGenerator.nextInt(10));
+        Set<String> result = Sets.newHashSetWithExpectedSize(setSize.get());
+        for(int index = 0; index < setSize.get(); index++) {
+          result.add(word);
+        }
+        return result;
+      }
+      throw new IllegalStateException("Not all required properties were set on this builder.");
+    }
+  }
 }
