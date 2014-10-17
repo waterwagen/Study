@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Predicate;
 
 public class Java8ImpatientLambdasChapter2ExercisesCompanion {
 
@@ -17,10 +18,18 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
 
   private static final String STREAM_EXERCISES_ROOT_DIRECTORY = "./src/test/resources/streamExercises/";
 
-  private static final String WORDS_TXT_FILENAME = "words.txt";
+  private static final String SMALL_WORDS_FILE_NAME = "words.txt";
+
+  private static final String VERYBIG_WORDS_FILE_NAME = "war_and_peace.txt";
 
   static List<String> getWords() throws IOException {
-    String wordsFilePath = STREAM_EXERCISES_ROOT_DIRECTORY + WORDS_TXT_FILENAME;
+    String wordsFilePath = STREAM_EXERCISES_ROOT_DIRECTORY + SMALL_WORDS_FILE_NAME;
+    String contents = new String(Files.readAllBytes(Paths.get(wordsFilePath)), StandardCharsets.UTF_8);
+    return Arrays.asList(contents.split("[\\P{L}]+"));
+  }
+
+  static List<String> getVeryBigNumberOfWords() throws IOException {
+    String wordsFilePath = STREAM_EXERCISES_ROOT_DIRECTORY + VERYBIG_WORDS_FILE_NAME;
     String contents = new String(Files.readAllBytes(Paths.get(wordsFilePath)), StandardCharsets.UTF_8);
     return Arrays.asList(contents.split("[\\P{L}]+"));
   }
@@ -41,6 +50,10 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
       }
     }
     return expectedLargeWordCount;
+  }
+
+  static Predicate<String> getWordLengthPredicate(int wordLengthBoundary) {
+    return word -> word.length() > wordLengthBoundary;
   }
 
   static class LargeWordCounter implements Callable<Integer> {

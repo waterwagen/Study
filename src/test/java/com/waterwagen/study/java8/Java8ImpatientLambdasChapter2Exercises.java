@@ -50,8 +50,8 @@ public class Java8ImpatientLambdasChapter2Exercises {
   @Test
   public void exercise2() throws Exception {
     List<String> words = getWords();
+    Predicate<? super String> wordLengthFunction = getWordLengthPredicate(4);
 
-    Predicate<? super String> wordLengthFunction = word -> word.length() > 4;
     AtomicInteger filterCount = new AtomicInteger(0);
     int maxNumberOfWords = 5;
     List<String> collectedList = words.stream().sequential().filter(word -> {
@@ -67,6 +67,37 @@ public class Java8ImpatientLambdasChapter2Exercises {
     assertEquals("Failed sanity check.", 5, collectedList.size());
     assertTrue("Expected the stream to filter less than the total number of words as the number of results is limited.",
       filterCount.get() < words.size());
+  }
+
+  @Test
+  public void exercise3() throws Exception {
+    List<String> words = getVeryBigNumberOfWords();
+    Predicate<? super String> wordLengthFunction = getWordLengthPredicate(4);
+
+    words.stream().count(); // warm up streaming
+
+    // implicitly sequential stream
+    Stopwatch stopwatch = new Stopwatch();
+    long sequentialLongWordCount = words.stream().filter(wordLengthFunction).count();
+    System.out.println(String.format("time elapsed (implicitly sequential): %f", stopwatch.elapsedTime()));
+
+    // explicitly sequential stream
+    stopwatch = new Stopwatch();
+    long sequential2LongWordCount = words.stream().sequential().filter(wordLengthFunction).count();
+    System.out.println(String.format("time elapsed (explicitly sequential): %f", stopwatch.elapsedTime()));
+
+    stopwatch = new Stopwatch();
+    long parallelLongWordCount = words.stream().parallel().filter(wordLengthFunction).count();
+    System.out.println(String.format("time elapsed (modified to be parallel): %f", stopwatch.elapsedTime()));
+
+    // this one is at least an order of magnitude faster than both of the above, including the other parallel stream
+    stopwatch = new Stopwatch();
+    long parallel2LongWordCount = words.parallelStream().filter(wordLengthFunction).count();
+    System.out.println(String.format("time elapsed (created as parallel): %f", stopwatch.elapsedTime()));
+
+    assertEquals("Failed sanity check.", sequentialLongWordCount, sequential2LongWordCount);
+    assertEquals("Failed sanity check.", parallelLongWordCount, parallel2LongWordCount);
+    assertEquals("Failed sanity check.", sequentialLongWordCount, parallelLongWordCount);
   }
 
 }
