@@ -1,0 +1,83 @@
+Work next steps
+
+
+Read career improvement texts:
+	- Cracking the Coding Interview
+	- Applying UML & Patterns, max(1 chapter, 16 pages)
+	- Effective Java, 2 items
+	- Design patterns, 1 item
+
+Develop MRIS application for Jake.
+
+Take algorithm class online.
+
+Work on Scala for the Impatient.
+
+Take Scala functional programming class online.
+
+Write my first Android app.
+
+----------------------------------------------------------
+
+http://www.martinfowler.com/articles/mocksArentStubs.html
+
+Review design patterns (book: http://amzn.to/Vi5Bwz , online: http://www.oodesign.com/ ).
+
+Learn PIT ( http://pitest.org/ ). (test quality checker)
+
+Learn Hibernate basics. 
+
+Learn current web services (especially RESTful).
+
+Learn GWT basics. (Java to Javascript UI building tool) 
+
+Learn Grails basics.
+
+Learn Lift basics.
+
+Research requirements categorization. 
+
+Research XStream vs JAXB vs XmlBeans. 
+
+Try Eclipse program 'WindowBuilder' for WYSIWYG swing GUI building
+
+Research ScalaTest ( http://www.scalatest.org )
+
+Learn GIT.
+
+Research lightweight dbs HSQLDB and Mckoi for testing or lightweight applications ( http://hsqldb.org/ , http://mckoi.com/originalmckoisql/index.html )
+
+Research incremental db change tools ( http://migrate4j.sourceforge.net/ , http://code.google.com/p/dbmigrate/ , http://code.google.com/p/flyway/ , http://dbdeploy.com/ , http://code.google.com/p/dbdeploy/ ) 
+Learn Griffon basics. (desktop UI development using Groovy)
+
+Learn Sonar basics. (code quality checking)
+
+Learn Clover basics ( http://www.atlassian.com/software/clover/overview ) (code coverage of tests)
+
+Learn EEMA basics ( http://emma.sourceforge.net ). (code coverage of tests)
+
+Research TypeSafe stack (Play, Akka, Scala)
+
+Research DBUnit ( http://www.dbunit.org ). (db assistance for unit testing in JUnit)
+
+Learn Xtext ( http://www.eclipse.org/Xtext/index.html ) (tool for creating programming languages and domain specific languages (DSLs))
+
+Learn Nexus artifact manager for Maven ( http://nexus.sonatype.org ) 
+
+Use Camel to store (any) JMS messages in a database (Oracle).
+
+Learn Ruby basics.
+
+Try using Camel to send a message to the printer.
+
+Get Spring set up and figure out how to utilize it.
+
+Try Guice AOP.
+
+Learn JavaFX.
+
+Learn GBench (benchmark tool for Groovy)
+
+
+
+java,programming,development,coding,todo
