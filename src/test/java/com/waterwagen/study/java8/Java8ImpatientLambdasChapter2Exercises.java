@@ -14,9 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.waterwagen.study.java8.Java8ImpatientLambdasChapter2ExercisesCompanion.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class Java8ImpatientLambdasChapter2Exercises {
@@ -106,6 +108,14 @@ public class Java8ImpatientLambdasChapter2Exercises {
     int[] values = {1,4,9,13};
     IntStream stream = IntStream.of(values);
     assertEquals(1, stream.filter(num -> num >= 10).count());
+  }
+
+  @Test
+  public void exercise5() throws Exception {
+    Stream<Long> randomNumberStream =
+      Stream.iterate(0L, x -> linearCongruentialGeneratorHelper(x, 25214903917l, 11, (long) Math.pow(2, 48)));
+    List<Long> twoRandomNumbers = randomNumberStream.limit(2).collect(Collectors.toList());
+    assertFalse(twoRandomNumbers.get(0).equals(twoRandomNumbers.get(1)));
   }
 
 }

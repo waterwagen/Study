@@ -56,6 +56,10 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
     return word -> word.length() > wordLengthBoundary;
   }
 
+  static long linearCongruentialGeneratorHelper(long x, long a, long c, long m) {
+    return ((a * x) + c) % m;
+  }
+
   static class LargeWordCounter implements Callable<Integer> {
 
     private final List<String> words;
