@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.waterwagen.study.java8.Java8ImpatientLambdasChapter2ExercisesCompanion.*;
 import static org.junit.Assert.assertEquals;
@@ -98,6 +99,13 @@ public class Java8ImpatientLambdasChapter2Exercises {
     assertEquals("Failed sanity check.", sequentialLongWordCount, sequential2LongWordCount);
     assertEquals("Failed sanity check.", parallelLongWordCount, parallel2LongWordCount);
     assertEquals("Failed sanity check.", sequentialLongWordCount, parallelLongWordCount);
+  }
+
+  @Test
+  public void exercise4() throws Exception {
+    int[] values = {1,4,9,13};
+    IntStream stream = IntStream.of(values);
+    assertEquals(1, stream.filter(num -> num >= 10).count());
   }
 
 }
