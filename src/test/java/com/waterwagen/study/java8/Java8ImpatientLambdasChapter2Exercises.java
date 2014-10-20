@@ -7,9 +7,7 @@ import org.junit.Test;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -125,6 +123,16 @@ public class Java8ImpatientLambdasChapter2Exercises {
     assertEquals('a', charList.get(0).charValue());
     assertEquals('f', charList.get(5).charValue());
     assertEquals('d', charList.get(10).charValue());
+  }
+
+  @Test
+  public void exercise7() throws Exception {
+    String someString = "a;sdlfjkasdlfjasfd";
+    Stream<Integer> finiteStream = Stream.iterate(0, n -> n + 1).limit(someString.length());
+    assertEquals(false, isInfinite(finiteStream));
+
+    Stream<Integer> infiniteStream = Stream.iterate(0, n -> n + 1);
+    assertEquals(true, isInfinite(infiniteStream));
   }
 
 }

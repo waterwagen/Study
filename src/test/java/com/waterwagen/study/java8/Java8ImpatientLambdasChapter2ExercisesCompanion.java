@@ -7,10 +7,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class Java8ImpatientLambdasChapter2ExercisesCompanion {
 
@@ -58,6 +57,17 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
 
   static long linearCongruentialGeneratorHelper(long x, long a, long c, long m) {
     return ((a * x) + c) % m;
+  }
+
+  static <T> boolean isInfinite(Stream<T> stream) throws ExecutionException, InterruptedException {
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    Future<Long> result = executor.submit(() -> stream.count());
+    try {
+      result.get(1, TimeUnit.SECONDS);
+      return false;
+    } catch (TimeoutException e) {
+      return true;
+    }
   }
 
   static class LargeWordCounter implements Callable<Integer> {
