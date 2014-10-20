@@ -17,9 +17,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.waterwagen.study.java8.Java8ImpatientLambdasChapter2ExercisesCompanion.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class Java8ImpatientLambdasChapter2Exercises {
 
@@ -47,7 +45,7 @@ public class Java8ImpatientLambdasChapter2Exercises {
     System.out.println(String.format("elapsed time (parallel): %f", stopwatch.elapsedTime()));
     assertEquals(expectedLargeWordCount, actualLargeWordCount);
     System.out.println(String.format("expected large word count = %d, actual large word count = %d",
-      expectedLargeWordCount, actualLargeWordCount));
+        expectedLargeWordCount, actualLargeWordCount));
   }
 
   @Test
@@ -116,6 +114,17 @@ public class Java8ImpatientLambdasChapter2Exercises {
       Stream.iterate(0L, x -> linearCongruentialGeneratorHelper(x, 25214903917l, 11, (long) Math.pow(2, 48)));
     List<Long> twoRandomNumbers = randomNumberStream.limit(2).collect(Collectors.toList());
     assertFalse(twoRandomNumbers.get(0).equals(twoRandomNumbers.get(1)));
+  }
+
+  @Test
+  public void exercise6() throws Exception {
+    String someString = "a;sdlfjkasdlfjasfd";
+
+    Stream<Character> stream = Stream.iterate(0, n -> n + 1).limit(someString.length()).map(someString::charAt);
+    List<Character> charList = stream.collect(Collectors.toList());
+    assertEquals('a', charList.get(0).charValue());
+    assertEquals('f', charList.get(5).charValue());
+    assertEquals('d', charList.get(10).charValue());
   }
 
 }
