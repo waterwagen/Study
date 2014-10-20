@@ -1,12 +1,12 @@
 package com.waterwagen.study.java8;
 
+import com.google.common.collect.Lists;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -68,6 +68,18 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
     } catch (TimeoutException e) {
       return true;
     }
+  }
+
+  static Stream<Character> zip(Stream<Character> charStream1, Stream<Character> charStream2) {
+    ArrayList<Iterator<Character>> streamIterators = Lists.newArrayList(charStream1.iterator(),
+                                                                        charStream2.iterator());
+    int nextIteratorIndex = 0;
+    Stream.Builder<Character> builder = Stream.builder();
+    while (streamIterators.get(0).hasNext()
+           && streamIterators.get(1).hasNext()) {
+      builder.add(streamIterators.get(nextIteratorIndex++ % 2).next());
+    }
+    return builder.build();
   }
 
   static class LargeWordCounter implements Callable<Integer> {
