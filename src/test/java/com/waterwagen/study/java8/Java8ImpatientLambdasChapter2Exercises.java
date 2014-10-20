@@ -1,17 +1,16 @@
 package com.waterwagen.study.java8;
 
+import com.google.common.collect.Lists;
 import com.waterwagen.algorithms.evaluate.Stopwatch;
 import com.waterwagen.study.java8.Java8ImpatientLambdasChapter2ExercisesCompanion.*;
 import org.junit.Test;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -154,4 +153,51 @@ public class Java8ImpatientLambdasChapter2Exercises {
     assertEquals('c', zippedIterator.next().charValue());
   }
 
+  @Test
+  public void exercise9NonReduceSolution() throws Exception {
+    testExercise9Solution(streamOfLists -> {
+      ArrayList<String> result = Lists.newArrayList();
+      streamOfLists.forEach(list -> result.addAll(list));
+      return result;
+    });
+  }
+
+  private void testExercise9Solution(Function<Stream<ArrayList<String>>, ArrayList<String>> flattenFunction) {
+    Stream<String> testStringsStream = Stream.iterate(1, n -> n + 1).limit(6).map(n -> "string" + n);
+    ArrayList<String> testStrings = testStringsStream.collect(Collectors.toCollection(Lists::newArrayList));
+//    ArrayList<String> testStrings = testStringsStream.collect(Lists::newArrayList, List::add, List::addAll);
+    ArrayList<String> flattenedList =
+      flattenFunction.apply(Stream.of(Lists.newArrayList(testStrings.get(0), testStrings.get(1)),
+                                      Lists.newArrayList(testStrings.get(2)),
+                                      Lists.newArrayList(testStrings.get(3), testStrings.get(4), testStrings.get(5))));
+    assertEquals("Unexpected flattened list returned.", testStrings, flattenedList);
+  }
+
+  @Test
+  public void exercise9ReduceSolution1() throws Exception {
+    testExercise9Solution(streamOfLists ->
+      streamOfLists.reduce(Lists.newArrayList(), this::combineArrayListsInFirst)
+    );
+  }
+
+  private <T> ArrayList<T> combineArrayListsInFirst(ArrayList<T> first, ArrayList<T>... otherLists) {
+    Stream.of(otherLists).sequential().forEach(list -> first.addAll(list));
+    return first;
+  }
+
+  @Test
+  public void exercise9ReduceSolution2() throws Exception {
+    testExercise9Solution(streamOfLists ->
+      streamOfLists.reduce(this::combineArrayListsInFirst).get()
+    );
+  }
+
+  @Test
+  public void exercise9ReduceSolution3() throws Exception {
+    testExercise9Solution(streamOfLists ->
+      streamOfLists.reduce(Lists.newArrayList(), this::combineArrayListsInFirst, this::combineArrayListsInFirst)
+    );
+  }
+
 }
+
