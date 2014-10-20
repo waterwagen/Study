@@ -108,4 +108,35 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
     }
 
   }
+
+  static class DoubleAverage {
+
+    static DoubleAverage updateAverageWithDouble(DoubleAverage stats, Double num) {
+      return new DoubleAverage(stats.count + 1, stats.total + num);
+    }
+
+    static DoubleAverage combineAverages(DoubleAverage stats1, DoubleAverage stats2) {
+      return new DoubleAverage(stats1.count + stats2.count, stats1.total + stats2.total);
+    }
+
+    private final int count;
+
+    private final double total;
+
+    private final double average;
+
+    DoubleAverage(int count, double total) {
+      this.count = count;
+      this.total = total;
+      this.average = total / count;
+    }
+
+    public String toString() {
+      return String.format("%s { count = %d, total = %f }", this.getClass().getSimpleName(), count, total);
+    }
+
+    double getAverage() {
+      return average;
+    }
+  }
 }

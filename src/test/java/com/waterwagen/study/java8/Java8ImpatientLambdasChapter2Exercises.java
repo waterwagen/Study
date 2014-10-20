@@ -199,5 +199,33 @@ public class Java8ImpatientLambdasChapter2Exercises {
     );
   }
 
+  @Test
+  public void exercise10() throws Exception {
+    testExercise10Solution(streamOfDoubles ->
+      streamOfDoubles.reduce(new DoubleAverage(0, 0),
+                             DoubleAverage::updateAverageWithDouble,
+                             DoubleAverage::combineAverages).getAverage()
+    );
+  }
+
+  private static void testExercise10Solution(Function<Stream<Double>, Double> avgFunction) {
+    int numberOfDoubles = 20;
+    Stream<Double> stream = Stream.iterate(0.0, n -> n + 1.7).limit(numberOfDoubles);
+
+    //calculate expected average
+    double expectedTotal = 0.0;
+    double lastNum = 0;
+    for(int doubleCount = 1; doubleCount <= numberOfDoubles - 1; doubleCount++) {
+      Double num = lastNum + 1.7;
+      expectedTotal += num;
+      lastNum = num;
+    }
+    double expectedAverage = expectedTotal / numberOfDoubles;
+    // calculate actual average
+    double actualAverage = avgFunction.apply(stream);
+
+    assertEquals(expectedAverage, actualAverage, 0.0000000000000000000001);
+  }
+
 }
 
