@@ -139,4 +139,25 @@ public class Java8ImpatientLambdasChapter2ExercisesCompanion {
       return average;
     }
   }
+
+  static final class ListItem<T> {
+
+    private final T item;
+
+    private final Integer index;
+
+    ListItem(T item, Integer index) {
+      this.item = item;
+      this.index = index;
+    }
+
+    T getItem() {
+      return item;
+    }
+
+    Integer getIndex() {
+      return index;
+    }
+
+  }
 }

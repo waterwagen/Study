@@ -10,8 +10,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -225,6 +227,31 @@ public class Java8ImpatientLambdasChapter2Exercises {
     double actualAverage = avgFunction.apply(stream);
 
     assertEquals(expectedAverage, actualAverage, 0.0000000000000000000001);
+  }
+
+  @Test
+  public void exercise11() throws Exception {
+    int numberOfItemsInStream = 10000;
+    Stream<Integer> originalStream = Stream.iterate(0, n -> n + 1).parallel().limit(numberOfItemsInStream);
+
+    AtomicInteger index = new AtomicInteger(-1);
+    Stream<ListItem<Integer>> indexedItemStream =
+      originalStream.sequential().map(i -> new ListItem<>(i, index.incrementAndGet()));
+    ArrayList<Integer> resultList = Lists.newArrayListWithCapacity(numberOfItemsInStream);
+    for(int i = 0; i < numberOfItemsInStream; i++) {
+      resultList.add(i);
+    }
+
+    Supplier<ArrayList<Integer>> resultTypeCreator = () -> resultList;
+    BiConsumer<ArrayList<Integer>, ListItem<Integer>> resultTypePopulator = (list, item) ->
+      list.set(item.getIndex(), item.getItem() * 2);
+    BiConsumer<ArrayList<Integer>, ArrayList<Integer>> resultTypeCombiner = (list1, list2) -> {};
+    indexedItemStream.collect(resultTypeCreator, resultTypePopulator, resultTypeCombiner);
+
+    assertEquals(0, resultList.get(0).intValue());
+    assertEquals(2 * 2, resultList.get(2).intValue());
+    assertEquals(101 * 2, resultList.get(101).intValue());
+    assertEquals(383 * 2, resultList.get(383).intValue());
   }
 
 }
