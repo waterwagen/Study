@@ -254,5 +254,17 @@ public class Java8ImpatientLambdasChapter2Exercises {
     assertEquals(383 * 2, resultList.get(383).intValue());
   }
 
+  @Test
+  public void exercise12() throws Exception {
+    AtomicInteger[] shortWordCounters = {new AtomicInteger(0), new AtomicInteger(0), new AtomicInteger(0)};
+    getVeryBigNumberOfWords().parallelStream().forEach(w -> {
+      if(w.length() <= 3) shortWordCounters[w.length() - 1].getAndIncrement();
+    });
+    System.out.println(String.format("1 letter word count = %s, 2 letter word count = %s, 3 letter word count = %s",
+        shortWordCounters[0], shortWordCounters[1], shortWordCounters[2]));
+    Arrays.asList(shortWordCounters).stream().forEach(c ->
+        assertTrue(c.get() > 0));
+  }
+
 }
 
