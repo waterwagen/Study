@@ -1,19 +1,22 @@
 package com.waterwagen.study.java8;
 
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.FileInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.waterwagen.study.java8.Java8ImpatientLambdasChapter3ExercisesCompanion.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static com.waterwagen.study.java8.Java8ImpatientLambdasChapter3ExercisesCompanion.*;
 
 public class Java8ImpatientLambdasChapter3Exercises {
 
@@ -75,6 +78,23 @@ public class Java8ImpatientLambdasChapter3Exercises {
     assertTrue("The test exception should have been thrown and not caught by the method.", caughtException != null);
     assertEquals("The locked action wasn't performed.", 1, someInt.get());
     assertFalse("The lock should have been unlocked after the action.", lock.isLocked());
+  }
+
+  @Test
+  public void exercise3() throws Exception {
+    //given
+    Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
+
+    //when
+    Image transformedImage = transform(originalImage, (x,y,color) -> {
+      if (isWithinImageBorder(x, y, originalImage)) {
+        return Color.BLACK;
+      }
+      return color;
+    });
+
+    //then
+    verifyImageBorderIsBlackAndCenterIsNot(transformedImage);
   }
 
 }
