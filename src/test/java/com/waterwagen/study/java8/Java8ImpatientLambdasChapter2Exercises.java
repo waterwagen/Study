@@ -14,6 +14,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -261,9 +262,20 @@ public class Java8ImpatientLambdasChapter2Exercises {
       if(w.length() <= 3) shortWordCounters[w.length() - 1].getAndIncrement();
     });
     System.out.println(String.format("1 letter word count = %s, 2 letter word count = %s, 3 letter word count = %s",
-        shortWordCounters[0], shortWordCounters[1], shortWordCounters[2]));
+      shortWordCounters[0], shortWordCounters[1], shortWordCounters[2]));
     Arrays.asList(shortWordCounters).stream().forEach(c ->
         assertTrue(c.get() > 0));
+  }
+
+  @Test
+  public void exercise13() throws Exception {
+    Map<Integer, Long> shortWordCountMap = getVeryBigNumberOfWords().parallelStream().filter(w -> w.length() <= 3)
+      .collect(Collectors.groupingBy(w -> w.length(), Collectors.counting()));
+    System.out.println(String.format("1 letter word count = %s, 2 letter word count = %s, 3 letter word count = %s",
+      shortWordCountMap.get(1), shortWordCountMap.get(2), shortWordCountMap.get(3)));
+    assertTrue(shortWordCountMap.get(1) > 0);
+    assertTrue(shortWordCountMap.get(2) > 0);
+    assertTrue(shortWordCountMap.get(3) > 0);
   }
 
 }
