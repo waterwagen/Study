@@ -6,11 +6,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static com.waterwagen.study.java8.Java8ImpatientLambdasChapter3ExercisesCompanion.*;
 
 public class Java8ImpatientLambdasChapter3Exercises {
 
@@ -47,6 +50,31 @@ public class Java8ImpatientLambdasChapter3Exercises {
       return true;
     }
     return false;
+  }
+
+  @Test
+  public void exercise2() throws Exception {
+    // given
+    AtomicInteger someInt = new AtomicInteger(0);
+    ReentrantLock lock = new ReentrantLock();
+
+    // when
+    Exception caughtException = null;
+    try {
+      withLock(lock, () -> {
+        someInt.incrementAndGet();
+        assertTrue("The lock should have been in a locked state.", lock.isLocked());
+        throw new RuntimeException("test exception to confirm the lock unlock always happens");
+      });
+    }
+    catch (Exception exc) {
+      caughtException = exc;
+    }
+
+    // then
+    assertTrue("The test exception should have been thrown and not caught by the method.", caughtException != null);
+    assertEquals("The locked action wasn't performed.", 1, someInt.get());
+    assertFalse("The lock should have been unlocked after the action.", lock.isLocked());
   }
 
 }
