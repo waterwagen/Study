@@ -1,7 +1,6 @@
 package com.waterwagen.study.java8;
 
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -87,14 +86,14 @@ public class Java8ImpatientLambdasChapter3Exercises {
 
     //when
     Image transformedImage = transform(originalImage, (x,y,color) -> {
-      if (isWithinImageBorder(x, y, originalImage)) {
-        return Color.BLACK;
+      if (isWithinImageBorder(new Point(x, y), originalImage)) {
+        return IMAGE_BORDER_COLOR;
       }
       return color;
     });
 
     //then
-    verifyImageBorderIsBlackAndCenterIsNot(transformedImage);
+    verifyImageBorderIsBorderColorAndCenterIsNot(transformedImage);
   }
 
 }
