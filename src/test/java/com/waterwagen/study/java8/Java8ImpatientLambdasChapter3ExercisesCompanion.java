@@ -6,8 +6,10 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Comparator;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 
 import static org.junit.Assert.*;
 
@@ -104,6 +106,10 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
       assertTrue(String.format("Expected transformed image to be darker than the other image but pixel at %s was not.", point),
         imageBrightness < otherImageBrightness);
     });
+  }
+
+  static Comparator<String> generateStringComparator(UnaryOperator<String> stringTransformer) {
+    return (string1, string2) -> stringTransformer.apply(string1).compareTo(stringTransformer.apply(string2));
   }
 
   @FunctionalInterface

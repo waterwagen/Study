@@ -1,15 +1,19 @@
 package com.waterwagen.study.java8;
 
 import javafx.scene.image.Image;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.FileInputStream;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,6 +112,73 @@ public class Java8ImpatientLambdasChapter3Exercises {
 
     // then
     verifyImageIsDarkerThanOtherImage(transformedImage, originalImage);
+  }
+
+  @Test
+  public void exercise7ForNormalComparator() throws Exception {
+    // when
+    Comparator<String> normal = generateStringComparator(string -> string);
+
+    // then
+    assertEquals(0, normal.compare("abc", "abc"));
+    assertTrue(normal.compare("abc", "zyx") < 0);
+    assertTrue(normal.compare("zyx", "abc") > 0);
+  }
+
+
+  @Test
+  public void exercise7ForReversedComparator() throws Exception {
+    // when
+    Comparator<String> normal = generateStringComparator(StringUtils::reverse);
+
+    // then
+    assertEquals(0, normal.compare("abc", "abc"));
+    assertTrue(normal.compare("zya", "abz") < 0);
+    assertTrue(normal.compare("abz", "zya") > 0);
+  }
+
+  @Test
+  public void exercise7ForCaseSensitiveComparator() throws Exception {
+    // when
+    Comparator<String> caseSensitive = generateStringComparator(string -> string);
+
+    // then
+    assertEquals(0, caseSensitive.compare("aBc", "aBc"));
+    assertTrue(caseSensitive.compare("aBc", "abc") < 0);
+    assertTrue(caseSensitive.compare("abc", "aBc") > 0);
+  }
+
+  @Test
+  public void exercise7ForCaseInsensitiveComparator() throws Exception {
+    // when
+    Comparator<String> caseInsensitive = generateStringComparator(String::toLowerCase);
+
+    // then
+    assertEquals(0, caseInsensitive.compare("abc", "aBc"));
+    assertTrue(caseInsensitive.compare("abc", "abd") < 0);
+    assertTrue(caseInsensitive.compare("abd", "abc") > 0);
+  }
+
+  @Test
+  public void exercise7ForSpaceSensitiveComparator() {
+    // when
+    Comparator<String> spaceSensitive = generateStringComparator(string -> string);
+
+    // then
+    assertEquals(0, spaceSensitive.compare(" abc", " abc"));
+    assertTrue(spaceSensitive.compare(" abc", "abc") < 0);
+    assertTrue(spaceSensitive.compare("abc", " abc") > 0);
+  }
+
+  @Test
+  public void exercise7ForSpaceInsensitiveComparator() {
+    // when
+    Comparator<String> spaceInsensitive = generateStringComparator(StringUtils::deleteWhitespace);
+
+    // then
+    assertEquals(0, spaceInsensitive.compare("abc", " ab c"));
+    assertTrue(spaceInsensitive.compare("aba", " abc") < 0);
+    assertTrue(spaceInsensitive.compare(" abd", "abc") > 0);
   }
 
 }
