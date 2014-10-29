@@ -1,13 +1,15 @@
 package com.waterwagen.study.java8;
 
+import com.waterwagen.study.util.PojomaticClass;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.concurrent.locks.Lock;
+import java.util.function.BiFunction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
@@ -27,6 +29,16 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     }
   }
 
+  public static <T> Image transform(Image image, BiFunction<Color, T, Color> colorTransformer, T arg) {
+    int width = (int) image.getWidth();
+    int height = (int) image.getHeight();
+    WritableImage out = new WritableImage(width, height);
+    for (int x = 0; x < width; x++)
+      for (int y = 0; y < height; y++)
+        out.getPixelWriter().setColor(x, y, colorTransformer.apply(image.getPixelReader().getColor(x, y), arg));
+    return out;
+  }
+
   static Image transform(Image image, ColorTransformer colorTransformer) {
     int width = (int) image.getWidth();
     int height = (int) image.getHeight();
@@ -38,14 +50,18 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
   }
 
   static void verifyImageBorderIsBorderColorAndCenterIsNot(Image image) {
+    verifyImagePixels(image, Java8ImpatientLambdasChapter3ExercisesCompanion::verifyPixelColorBasedOnBorder);
+  }
+
+  static void verifyImagePixels(Image image, PixelVerifier pixelVerifier) {
     for(int x = 0; x < image.getWidth(); x++) {
       for(int y = 0; y < image.getHeight(); y++) {
-        verifyPixelColor(new Point(x, y), image);
+        pixelVerifier.verify(new Point(x, y), image);
       }
     }
   }
 
-  private static void verifyPixelColor(Point pixel, Image image) {
+  private static void verifyPixelColorBasedOnBorder(Point pixel, Image image) {
     Color pixelColor = image.getPixelReader().getColor(pixel.x, pixel.y);
     if(isWithinImageBorder(pixel, image)) {
       verifyImageBorderPixelColor(IMAGE_BORDER_COLOR, pixelColor, pixel);
@@ -72,13 +88,22 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   private static void verifyNonImageBorderPixelColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
     assertFalse(
-      String.format("The color at pixel %d,%d in the image is NOT within the border but IS the border color %s.",
-        pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
-      expectedBorderColor.equals(pixelColor));
+        String.format("The color at pixel %d,%d in the image is NOT within the border but IS the border color %s.",
+            pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
+        expectedBorderColor.equals(pixelColor));
   }
 
   static String colorAsRgbString(Color color) {
     return color.getRed() + "/" + color.getGreen() + "/" + color.getBlue();
+  }
+
+  static void verifyImageIsDarkerThanOtherImage(Image transformedImage, Image otherImage) {
+    verifyImagePixels(transformedImage, (point, image) -> {
+      double imageBrightness = image.getPixelReader().getColor(point.x, point.y).getBrightness();
+      double otherImageBrightness = otherImage.getPixelReader().getColor(point.x, point.y).getBrightness();
+      assertTrue(String.format("Expected transformed image to be darker than the other image but pixel at %s was not.", point),
+        imageBrightness < otherImageBrightness);
+    });
   }
 
   @FunctionalInterface
@@ -86,7 +111,13 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     Color apply(int x, int y, Color colorAtXY);
   }
 
-  static final class Point {
+  @FunctionalInterface
+  private interface PixelVerifier {
+    void verify(Point point, Image image);
+  }
+
+  @AutoProperty
+  static final class Point extends PojomaticClass {
 
     final int x;
 

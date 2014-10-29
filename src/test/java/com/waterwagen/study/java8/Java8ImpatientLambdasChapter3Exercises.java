@@ -96,5 +96,19 @@ public class Java8ImpatientLambdasChapter3Exercises {
     verifyImageBorderIsBorderColorAndCenterIsNot(transformedImage);
   }
 
+  @Test
+  public void exercise6() throws Exception {
+    // given
+    Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
+
+    // when
+    Image transformedImage = transform(originalImage,
+                                       (color, brightnessFactor) -> color.deriveColor(0, 1, brightnessFactor, 1),
+                                       0.5);
+
+    // then
+    verifyImageIsDarkerThanOtherImage(transformedImage, originalImage);
+  }
+
 }
 
