@@ -81,10 +81,10 @@ public class Java8ImpatientLambdasChapter3Exercises {
 
   @Test
   public void exercise5() throws Exception {
-    //given
+    // given
     Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
 
-    //when
+    // when
     Image transformedImage = transform(originalImage, (x,y,color) -> {
       if (isWithinImageBorder(new Point(x, y), originalImage)) {
         return IMAGE_BORDER_COLOR;
@@ -92,7 +92,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
       return color;
     });
 
-    //then
+    // then
     verifyImageBorderIsBorderColorAndCenterIsNot(transformedImage);
   }
 
