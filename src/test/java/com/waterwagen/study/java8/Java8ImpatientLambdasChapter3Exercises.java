@@ -80,7 +80,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   }
 
   @Test
-  public void exercise3() throws Exception {
+  public void exercise5() throws Exception {
     //given
     Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
 
