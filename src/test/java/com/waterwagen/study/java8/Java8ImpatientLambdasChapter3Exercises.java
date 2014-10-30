@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -179,6 +178,20 @@ public class Java8ImpatientLambdasChapter3Exercises {
     assertEquals(0, spaceInsensitive.compare("abc", " ab c"));
     assertTrue(spaceInsensitive.compare("aba", " abc") < 0);
     assertTrue(spaceInsensitive.compare(" abd", "abc") > 0);
+  }
+
+  @Test
+  public void exercise7ForCombinationComparator() {
+    // when
+    UnaryOperator<String> whitespaceInsensitive = StringUtils::deleteWhitespace;
+    UnaryOperator<String> caseInsensitive = String::toLowerCase;
+    UnaryOperator<String> whitespaceAndCaseInsensitive = string -> whitespaceInsensitive.apply(caseInsensitive.apply(string));
+    Comparator<String> combinationComparator = generateStringComparator(whitespaceAndCaseInsensitive);
+
+    // then
+    assertEquals(0, combinationComparator.compare("abc", " aB c"));
+    assertTrue(combinationComparator.compare("aba", " Abc") < 0);
+    assertTrue(combinationComparator.compare(" Abd", "abc") > 0);
   }
 
 }
