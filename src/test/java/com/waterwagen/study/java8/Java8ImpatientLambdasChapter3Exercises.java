@@ -116,7 +116,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   @Test
   public void exercise7ForNormalComparator() throws Exception {
     // when
-    Comparator<String> normal = generateStringComparator(string -> string);
+    Comparator<String> normal = createStringComparator(string -> string);
 
     // then
     assertEquals(0, normal.compare("abc", "abc"));
@@ -128,7 +128,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   @Test
   public void exercise7ForReversedComparator() throws Exception {
     // when
-    Comparator<String> normal = generateStringComparator(StringUtils::reverse);
+    Comparator<String> normal = createStringComparator(StringUtils::reverse);
 
     // then
     assertEquals(0, normal.compare("abc", "abc"));
@@ -139,7 +139,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   @Test
   public void exercise7ForCaseSensitiveComparator() throws Exception {
     // when
-    Comparator<String> caseSensitive = generateStringComparator(string -> string);
+    Comparator<String> caseSensitive = createStringComparator(string -> string);
 
     // then
     assertEquals(0, caseSensitive.compare("aBc", "aBc"));
@@ -150,7 +150,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   @Test
   public void exercise7ForCaseInsensitiveComparator() throws Exception {
     // when
-    Comparator<String> caseInsensitive = generateStringComparator(String::toLowerCase);
+    Comparator<String> caseInsensitive = createStringComparator(String::toLowerCase);
 
     // then
     assertEquals(0, caseInsensitive.compare("abc", "aBc"));
@@ -161,7 +161,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   @Test
   public void exercise7ForSpaceSensitiveComparator() {
     // when
-    Comparator<String> spaceSensitive = generateStringComparator(string -> string);
+    Comparator<String> spaceSensitive = createStringComparator(string -> string);
 
     // then
     assertEquals(0, spaceSensitive.compare(" abc", " abc"));
@@ -172,7 +172,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
   @Test
   public void exercise7ForSpaceInsensitiveComparator() {
     // when
-    Comparator<String> spaceInsensitive = generateStringComparator(StringUtils::deleteWhitespace);
+    Comparator<String> spaceInsensitive = createStringComparator(StringUtils::deleteWhitespace);
 
     // then
     assertEquals(0, spaceInsensitive.compare("abc", " ab c"));
@@ -186,7 +186,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
     UnaryOperator<String> whitespaceInsensitive = StringUtils::deleteWhitespace;
     UnaryOperator<String> caseInsensitive = String::toLowerCase;
     UnaryOperator<String> whitespaceAndCaseInsensitive = string -> whitespaceInsensitive.apply(caseInsensitive.apply(string));
-    Comparator<String> combinationComparator = generateStringComparator(whitespaceAndCaseInsensitive);
+    Comparator<String> combinationComparator = createStringComparator(whitespaceAndCaseInsensitive);
 
     // then
     assertEquals(0, combinationComparator.compare("abc", " aB c"));

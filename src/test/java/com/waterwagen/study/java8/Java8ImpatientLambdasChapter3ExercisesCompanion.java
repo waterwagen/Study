@@ -108,7 +108,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     });
   }
 
-  static Comparator<String> generateStringComparator(UnaryOperator<String> stringTransformer) {
+  static Comparator<String> createStringComparator(UnaryOperator<String> stringTransformer) {
     return (string1, string2) -> stringTransformer.apply(string1).compareTo(stringTransformer.apply(string2));
   }
 
