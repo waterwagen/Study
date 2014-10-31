@@ -1,6 +1,7 @@
 package com.waterwagen.study.java8;
 
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -90,7 +92,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
     // when
     Image transformedImage = transform(originalImage, (x,y,color) -> {
       if (isWithinImageBorder(new Point(x, y), originalImage)) {
-        return IMAGE_BORDER_COLOR;
+        return DEFAULT_IMAGE_BORDER_COLOR;
       }
       return color;
     });
@@ -192,6 +194,20 @@ public class Java8ImpatientLambdasChapter3Exercises {
     assertEquals(0, combinationComparator.compare("abc", " aB c"));
     assertTrue(combinationComparator.compare("aba", " Abc") < 0);
     assertTrue(combinationComparator.compare(" Abd", "abc") > 0);
+  }
+
+  @Test
+  public void exercise8() throws FileNotFoundException {
+    // given
+    Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
+    BorderSpec borderSpec = new BorderSpec(15, Color.CYAN);
+
+    // when
+    Image transformedImage =
+      transform(originalImage, getColorTransformerForBorder(originalImage, borderSpec));
+
+    // then
+    verifyImageBorderIsBorderColorAndCenterIsNot(transformedImage, borderSpec);
   }
 
 }

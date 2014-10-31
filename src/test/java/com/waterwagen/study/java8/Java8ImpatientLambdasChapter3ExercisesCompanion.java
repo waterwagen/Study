@@ -17,9 +17,11 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   static final String GRAY_SQUARE_IMAGE_FILE_NAME = "./src/test/resources/grayRectangle.png";
 
-  static final int IMAGE_BORDER_WIDTH = 10;
+  static final int DEFAULT_IMAGE_BORDER_WIDTH = 10;
 
-  static final Color IMAGE_BORDER_COLOR = Color.BLACK;
+  static final Color DEFAULT_IMAGE_BORDER_COLOR = Color.BLACK;
+
+  static final BorderSpec DEFAULT_BORDER_SPEC = new BorderSpec(DEFAULT_IMAGE_BORDER_WIDTH, DEFAULT_IMAGE_BORDER_COLOR);
 
   static void withLock(Lock lock, Runnable action) {
     lock.lock();
@@ -52,7 +54,19 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
   }
 
   static void verifyImageBorderIsBorderColorAndCenterIsNot(Image image) {
-    verifyImagePixels(image, Java8ImpatientLambdasChapter3ExercisesCompanion::verifyPixelColorBasedOnBorder);
+    verifyImageBorderIsBorderColorAndCenterIsNot(image, DEFAULT_BORDER_SPEC);
+  }
+
+  static void verifyImageBorderIsBorderColorAndCenterIsNot(Image imageToVerify, BorderSpec borderSpec) {
+    verifyImagePixels(imageToVerify, (point, image) -> {
+      Color pixelColor = image.getPixelReader().getColor(point.x, point.y);
+      if(isWithinImageBorder(point, image, borderSpec.thickness)) {
+        verifyImageBorderPixelColor(borderSpec.color, pixelColor, point);
+      }
+      else {
+        verifyNonImageBorderPixelColor(borderSpec.color, pixelColor, point);
+      }
+    });
   }
 
   static void verifyImagePixels(Image image, PixelVerifier pixelVerifier) {
@@ -63,22 +77,16 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     }
   }
 
-  private static void verifyPixelColorBasedOnBorder(Point pixel, Image image) {
-    Color pixelColor = image.getPixelReader().getColor(pixel.x, pixel.y);
-    if(isWithinImageBorder(pixel, image)) {
-      verifyImageBorderPixelColor(IMAGE_BORDER_COLOR, pixelColor, pixel);
-    }
-    else {
-      verifyNonImageBorderPixelColor(IMAGE_BORDER_COLOR, pixelColor, pixel);
-    }
+  static boolean isWithinImageBorder(Point pixel, Image image) {
+    return isWithinImageBorder(pixel, image, DEFAULT_IMAGE_BORDER_WIDTH);
   }
 
-  static boolean isWithinImageBorder(Point pixel, Image image) {
+  static boolean isWithinImageBorder(Point pixel, Image image, int borderThickness) {
     int imageWidth = (int) image.getWidth();
     int imageHeight = (int) image.getHeight();
 
-    return ((pixel.x <= IMAGE_BORDER_WIDTH - 1 || imageWidth - pixel.x <= IMAGE_BORDER_WIDTH)
-        || (pixel.y <= IMAGE_BORDER_WIDTH - 1 || imageHeight - pixel.y <= IMAGE_BORDER_WIDTH));
+    return ((pixel.x <= borderThickness - 1 || imageWidth - pixel.x <= borderThickness)
+        || (pixel.y <= borderThickness - 1 || imageHeight - pixel.y <= borderThickness));
   }
 
   private static void verifyImageBorderPixelColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
@@ -112,6 +120,15 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     return (string1, string2) -> stringTransformer.apply(string1).compareTo(stringTransformer.apply(string2));
   }
 
+  static ColorTransformer getColorTransformerForBorder(Image originalImage, BorderSpec borderSpec) {
+    return (x,y,color) -> {
+      if (isWithinImageBorder(new Point(x, y), originalImage, borderSpec.thickness)) {
+        return borderSpec.color;
+      }
+      return color;
+    };
+  }
+
   @FunctionalInterface
   static interface ColorTransformer {
     Color apply(int x, int y, Color colorAtXY);
@@ -132,6 +149,19 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     Point(int x, int y) {
       this.x = x;
       this.y = y;
+    }
+
+  }
+
+  static final class BorderSpec {
+
+    final int thickness;
+
+    final Color color;
+
+    BorderSpec(int thickness, Color color) {
+      this.thickness = thickness;
+      this.color = color;
     }
 
   }
