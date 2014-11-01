@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
@@ -184,10 +185,18 @@ public class Java8ImpatientLambdasChapter3Exercises {
 
   @Test
   public void exercise7ForCombinationComparator() {
-    // when
+    solutionForCombinationStringComparator((f1, f2) -> string -> f1.apply(f2.apply(string)));
+  }
+
+  private <T> void solutionForCombinationStringComparator(
+      BiFunction<UnaryOperator<String>, UnaryOperator<String>, UnaryOperator<String>> unaryOperatorCombiner) {
+    // given
     UnaryOperator<String> whitespaceInsensitive = StringUtils::deleteWhitespace;
     UnaryOperator<String> caseInsensitive = String::toLowerCase;
-    UnaryOperator<String> whitespaceAndCaseInsensitive = string -> whitespaceInsensitive.apply(caseInsensitive.apply(string));
+    UnaryOperator<String> whitespaceAndCaseInsensitive =
+      unaryOperatorCombiner.apply(whitespaceInsensitive, caseInsensitive);
+
+    // when
     Comparator<String> combinationComparator = createStringComparator(whitespaceAndCaseInsensitive);
 
     // then
@@ -227,6 +236,20 @@ public class Java8ImpatientLambdasChapter3Exercises {
         0 < lexicographicComparator.compare(object1, object3));
     assertTrue("Expected comparator result to be less than 1.",
         0 > lexicographicComparator.compare(object1, object4));
+  }
+
+
+  /**
+   * An alternate (possibly improved) approach to the combination solution for exercise 7. Gets around the mismatch
+   * between the compose (and the similar andThen()) method's return value's nominal (i.e. structure AND name) type
+   * (Function<String, String>) difference from what the createStringComparator() method wants (UnaryOperator<String>)
+   * by taking advantage of the fact that the structural types are the same (String -> String). We do this by using a
+   * method reference to use the implementation of the Function<String,String> to provide to Java 8 which will turn
+   * that implementation into a UnaryOperator<String> for us.
+   */
+  @Test
+  public void exercise10() {
+    solutionForCombinationStringComparator((f1, f2) -> f1.andThen(f2)::apply);
   }
 
 }
