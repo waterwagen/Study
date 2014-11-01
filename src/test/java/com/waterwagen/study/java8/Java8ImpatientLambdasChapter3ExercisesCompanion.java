@@ -129,6 +129,25 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     };
   }
 
+  static <T> Comparator<T> lexicographicComparator(String... fieldsToCompare) {
+    return (T object1, T object2) -> {
+      for(String field : fieldsToCompare) {
+        try {
+          String field1 = (String) object1.getClass().getField(field).get(object1);
+          String field2 = (String) object2.getClass().getField(field).get(object2);
+          int result = field1.compareTo(field2);
+          if (result != 0) {
+            return result;
+          }
+        }
+        catch(Exception exc) {
+          throw new RuntimeException(exc);
+        }
+      }
+      return 0;
+    };
+  }
+
   @FunctionalInterface
   static interface ColorTransformer {
     Color apply(int x, int y, Color colorAtXY);
@@ -166,4 +185,19 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   }
 
+  static final class Name {
+
+    public final String firstName;
+
+    public final String middleName;
+
+    public final String lastName;
+
+    Name(String firstName, String middleName, String lastName) {
+      this.firstName = firstName;
+      this.middleName = middleName;
+      this.lastName = lastName;
+    }
+
+  }
 }

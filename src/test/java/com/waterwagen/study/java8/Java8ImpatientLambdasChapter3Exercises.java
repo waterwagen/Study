@@ -210,5 +210,24 @@ public class Java8ImpatientLambdasChapter3Exercises {
     verifyImageBorderIsBorderColorAndCenterIsNot(transformedImage, borderSpec);
   }
 
+  @Test
+  public void exercise9() throws FileNotFoundException {
+    // given
+    Name object1 = new Name("John", "Samuel", "Smith");
+    Name object2 = new Name("John", "Tyler", "Smith");
+    Name object3 = new Name("Adam", "Barnhardt", "Smith");
+    Name object4 = new Name("Caleb", "Barnhardt", "Taylor");
+
+    // when
+    Comparator<Name> lexicographicComparator = lexicographicComparator("lastName", "firstName");
+
+    // then
+    assertEquals("Unexpected comparator result.", 0, lexicographicComparator.compare(object1, object2));
+    assertTrue("Expected comparator result to be greater than 1.",
+        0 < lexicographicComparator.compare(object1, object3));
+    assertTrue("Expected comparator result to be less than 1.",
+        0 > lexicographicComparator.compare(object1, object4));
+  }
+
 }
 
