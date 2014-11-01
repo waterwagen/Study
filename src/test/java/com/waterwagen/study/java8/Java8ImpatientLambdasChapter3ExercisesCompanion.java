@@ -172,7 +172,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   }
 
-  static final class BorderSpec {
+  static final class BorderSpec extends PojomaticClass {
 
     final int thickness;
 
@@ -185,7 +185,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   }
 
-  static final class Name {
+  static final class Name extends PojomaticClass {
 
     public final String firstName;
 
