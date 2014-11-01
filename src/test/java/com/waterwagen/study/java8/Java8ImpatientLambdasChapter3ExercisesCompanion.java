@@ -120,7 +120,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     return (string1, string2) -> stringTransformer.apply(string1).compareTo(stringTransformer.apply(string2));
   }
 
-  static ColorTransformer getColorTransformerForBorder(Image originalImage, BorderSpec borderSpec) {
+  static ColorTransformer createColorTransformerForBorder(Image originalImage, BorderSpec borderSpec) {
     return (x,y,color) -> {
       if (isWithinImageBorder(new Point(x, y), originalImage, borderSpec.thickness)) {
         return borderSpec.color;

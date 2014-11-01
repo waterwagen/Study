@@ -213,7 +213,7 @@ public class Java8ImpatientLambdasChapter3Exercises {
 
     // when
     Image transformedImage =
-      transform(originalImage, getColorTransformerForBorder(originalImage, borderSpec));
+      transform(originalImage, createColorTransformerForBorder(originalImage, borderSpec));
 
     // then
     verifyImageBorderIsBorderColorAndCenterIsNot(transformedImage, borderSpec);
