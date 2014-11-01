@@ -33,7 +33,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     }
   }
 
-  public static <T> Image transform(Image image, BiFunction<Color, T, Color> colorTransformer, T arg) {
+  static <T> Image transform(Image image, BiFunction<Color, T, Color> colorTransformer, T arg) {
     int width = (int) image.getWidth();
     int height = (int) image.getHeight();
     WritableImage out = new WritableImage(width, height);
