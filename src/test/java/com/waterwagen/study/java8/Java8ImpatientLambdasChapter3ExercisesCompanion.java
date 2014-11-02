@@ -64,7 +64,25 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
         verifyImageBorderPixelColor(borderSpec.color, pixelColor, point);
       }
       else {
-        verifyNonImageBorderPixelColor(borderSpec.color, pixelColor, point);
+        verifyNonImageBorderPixelIsNotColor(borderSpec.color, pixelColor, point);
+      }
+    });
+  }
+
+  static void verifyImageBorderColor(Image imageToVerify, BorderSpec borderSpec) {
+    verifyImagePixels(imageToVerify, (point, image) -> {
+      Color pixelColor = image.getPixelReader().getColor(point.x, point.y);
+      if(isWithinImageBorder(point, image, borderSpec.thickness)) {
+        verifyImageBorderPixelColor(borderSpec.color, pixelColor, point);
+      }
+    });
+  }
+
+  static void verifyNonBorderImageColor(Image imageToVerify, BorderSpec borderSpec, Color nonBorderColor) {
+    verifyImagePixels(imageToVerify, (point, image) -> {
+      Color pixelColor = image.getPixelReader().getColor(point.x, point.y);
+      if(!isWithinImageBorder(point, image, borderSpec.thickness)) {
+        verifyNonImageBorderPixelColor(nonBorderColor, pixelColor, point);
       }
     });
   }
@@ -90,17 +108,43 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
   }
 
   private static void verifyImageBorderPixelColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
-    assertEquals(
-        String.format("The color at pixel %d,%d in the image IS within the border but is NOT the border color %s.",
-            pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
-        colorAsRgbString(expectedBorderColor), colorAsRgbString(pixelColor));
+    verifyPixelIsColor(expectedBorderColor,
+                       pixelColor,
+                       pixel,
+                       "The color at pixel %d,%d in the image IS within the border but is NOT the border color %s.");
   }
 
-  private static void verifyNonImageBorderPixelColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
+  private static void verifyPixelIsColor(Color expectedBorderColor,
+                                         Color pixelColor,
+                                         Point pixel,
+                                         String errorMessage) {
+    assertEquals(
+      String.format(errorMessage, pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
+      colorAsRgbString(expectedBorderColor), colorAsRgbString(pixelColor));
+  }
+
+  private static void verifyNonImageBorderPixelColor(Color expectedNonBorderColor, Color pixelColor, Point pixel) {
+    verifyPixelIsColor(
+      expectedNonBorderColor,
+      pixelColor,
+      pixel,
+      "The color at pixel %d,%d in the image is in the image center but is NOT the non-border color %s.");
+  }
+
+  private static void verifyNonImageBorderPixelIsNotColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
+    verifyPixelIsNotColor(expectedBorderColor,
+                          pixelColor,
+                          pixel,
+                          "The color at pixel %d,%d in the image is NOT within the border but IS the border color %s.");
+  }
+
+  private static void verifyPixelIsNotColor(Color expectedBorderColor,
+                                            Color pixelColor,
+                                            Point pixel,
+                                            String errorMessage) {
     assertFalse(
-        String.format("The color at pixel %d,%d in the image is NOT within the border but IS the border color %s.",
-            pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
-        expectedBorderColor.equals(pixelColor));
+      String.format(errorMessage, pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
+      expectedBorderColor.equals(pixelColor));
   }
 
   static String colorAsRgbString(Color color) {
@@ -146,6 +190,28 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
       }
       return 0;
     };
+  }
+
+  static Point getCenterPointOfImage(Image originalImage) {
+    return new Point((int) originalImage.getWidth() / 2, (int) originalImage.getHeight() / 2);
+  }
+
+  static Color getImageColorAtPoint(Image image, Point point) {
+    return image.getPixelReader().getColor(point.x, point.y);
+  }
+
+  static ColorTransformer combineColorTransformers(ColorTransformer... transformers) {
+    return (x, y, color) -> {
+      Color result = color;
+      for (ColorTransformer colorTransformer : transformers) {
+        result = colorTransformer.apply(x, y, result);
+      }
+      return result;
+    };
+  }
+
+  static ColorTransformer toColorTransformer(UnaryOperator<Color> brightenOperator) {
+    return (x, y, color) -> brightenOperator.apply(color);
   }
 
   @FunctionalInterface

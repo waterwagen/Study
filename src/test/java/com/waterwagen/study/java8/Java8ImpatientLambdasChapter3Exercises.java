@@ -252,5 +252,25 @@ public class Java8ImpatientLambdasChapter3Exercises {
     solutionForCombinationStringComparator((f1, f2) -> f1.andThen(f2)::apply);
   }
 
+  @Test
+  public void exercise11() throws FileNotFoundException {
+    // given
+    Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
+    BorderSpec borderSpec = new BorderSpec(15, Color.CYAN);
+    ColorTransformer borderTransformer = createColorTransformerForBorder(originalImage, borderSpec);
+    UnaryOperator<Color> brightenOperator = color -> color.brighter();
+    ColorTransformer brightenTransformer = toColorTransformer(brightenOperator);
+    ColorTransformer brightenAndBorderTransformer = combineColorTransformers(brightenTransformer, borderTransformer);
+
+    // when
+    Image transformedImage = transform(originalImage, brightenAndBorderTransformer);
+
+    // then
+    verifyImageBorderColor(transformedImage, borderSpec);
+    Point imageCenter = getCenterPointOfImage(originalImage);
+    Color originalCenterColor = getImageColorAtPoint(originalImage, imageCenter);
+    verifyNonBorderImageColor(transformedImage, borderSpec, brightenOperator.apply(originalCenterColor));
+  }
+
 }
 
