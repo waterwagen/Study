@@ -1,5 +1,6 @@
 package com.waterwagen.study.java8;
 
+import com.google.common.collect.Lists;
 import com.waterwagen.study.util.PojomaticClass;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -7,6 +8,7 @@ import javafx.scene.paint.Color;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
@@ -266,4 +268,45 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     }
 
   }
+
+  static class LatentImage {
+
+    private final Image in;
+
+    private final List<ColorTransformer> pendingOperations = Lists.newArrayList();
+
+    private LatentImage(Image in) {
+      this.in = in;
+    }
+
+    static LatentImage from(Image in) {
+      return new LatentImage(in);
+    }
+
+    LatentImage transform(UnaryOperator<Color> unaryOperator) {
+      return transform((x, y, color) -> unaryOperator.apply(color));
+    }
+
+    LatentImage transform(ColorTransformer colorTransformer) {
+      pendingOperations.add(colorTransformer);
+      return this;
+    }
+
+    Image toImage() {
+      int width = (int) in.getWidth();
+      int height = (int) in.getHeight();
+      WritableImage out = new WritableImage(width, height);
+      for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++) {
+          Color c = in.getPixelReader().getColor(x, y);
+          for (ColorTransformer colorTransformer : pendingOperations) {
+            c = colorTransformer.apply(x, y, c);
+            out.getPixelWriter().setColor(x, y, c);
+          }
+        }
+      return out;
+    }
+
+  }
+
 }

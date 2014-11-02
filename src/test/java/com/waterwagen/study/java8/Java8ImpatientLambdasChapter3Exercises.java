@@ -272,5 +272,26 @@ public class Java8ImpatientLambdasChapter3Exercises {
     verifyNonBorderImageColor(transformedImage, borderSpec, brightenOperator.apply(originalCenterColor));
   }
 
+  @Test
+  public void exercise12() throws FileNotFoundException {
+    // given
+    Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
+    BorderSpec borderSpec = new BorderSpec(15, Color.CYAN);
+    ColorTransformer borderTransformer = createColorTransformerForBorder(originalImage, borderSpec);
+    UnaryOperator<Color> brightenOperator = color -> color.brighter();
+
+    // when
+    Image transformedImage = LatentImage.from(originalImage)
+                                        .transform(brightenOperator)
+                                        .transform(borderTransformer)
+                                        .toImage();
+
+    // then
+    verifyImageBorderColor(transformedImage, borderSpec);
+    Point imageCenter = getCenterPointOfImage(originalImage);
+    Color originalCenterColor = getImageColorAtPoint(originalImage, imageCenter);
+    verifyNonBorderImageColor(transformedImage, borderSpec, brightenOperator.apply(originalCenterColor));
+  }
+
 }
 
