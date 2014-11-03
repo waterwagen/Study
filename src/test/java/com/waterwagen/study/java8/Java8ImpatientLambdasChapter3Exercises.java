@@ -91,8 +91,8 @@ public class Java8ImpatientLambdasChapter3Exercises {
     Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
 
     // when
-    Image transformedImage = transform(originalImage, (x,y,color) -> {
-      if (isWithinImageBorder(new Point(x, y), originalImage)) {
+    Image transformedImage = transform(originalImage, (color, x, y, image) -> {
+      if (isWithinImageBorder(new Point(x, y), image)) {
         return DEFAULT_IMAGE_BORDER_COLOR;
       }
       return color;
@@ -277,8 +277,8 @@ public class Java8ImpatientLambdasChapter3Exercises {
     // given
     Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
     BorderSpec borderSpec = new BorderSpec(15, Color.CYAN);
-    ColorTransformer borderTransformer = createColorTransformerForBorder(originalImage, borderSpec);
     UnaryOperator<Color> brightenOperator = color -> color.brighter();
+    ColorTransformer borderTransformer = createColorTransformerForBorder(originalImage, borderSpec);
 
     // when
     Image transformedImage = LatentImage.from(originalImage)
@@ -291,6 +291,29 @@ public class Java8ImpatientLambdasChapter3Exercises {
     Point imageCenter = getCenterPointOfImage(originalImage);
     Color originalCenterColor = getImageColorAtPoint(originalImage, imageCenter);
     verifyNonBorderImageColor(transformedImage, borderSpec, brightenOperator.apply(originalCenterColor));
+  }
+
+  @Test
+  public void exercise13() throws FileNotFoundException {
+    // given
+    Image originalImage = new Image(new FileInputStream(GRAY_SQUARE_IMAGE_FILE_NAME));
+    UnaryOperator<Color> brightenOperator = color -> color.brighter();
+    ColorTransformer blurTransformer = Java8ImpatientLambdasChapter3ExercisesCompanion::blurPixelColor;
+
+    // when
+    Image transformedImage = LatentImage.from(originalImage)
+                                        .transform(brightenOperator)
+                                        .transformConvolutionFilter(blurTransformer)
+                                        .toImage();
+
+    // then
+    Image brightenedImage = transform(originalImage, toColorTransformer(brightenOperator));
+    verifyImagePixels(transformedImage, (point, image) -> {
+      Color pixelColor = image.getPixelReader().getColor(point.x, point.y);
+      Color brightenedImageColor = brightenedImage.getPixelReader().getColor(point.x, point.y);
+      Color expectedColor = blurTransformer.apply(brightenedImageColor, point.x, point.y, brightenedImage);
+      verifyColorsAreEqual(pixelColor, expectedColor);
+    });
   }
 
 }

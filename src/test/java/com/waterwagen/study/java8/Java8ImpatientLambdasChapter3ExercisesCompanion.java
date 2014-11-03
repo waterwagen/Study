@@ -1,6 +1,8 @@
 package com.waterwagen.study.java8;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.waterwagen.Utilities;
 import com.waterwagen.study.util.PojomaticClass;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -9,9 +11,14 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -50,8 +57,10 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     int height = (int) image.getHeight();
     WritableImage out = new WritableImage(width, height);
     for (int x = 0; x < width; x++)
-      for (int y = 0; y < height; y++)
-        out.getPixelWriter().setColor(x, y, colorTransformer.apply(x, y, image.getPixelReader().getColor(x, y)));
+      for (int y = 0; y < height; y++) {
+        Color pixelColor = image.getPixelReader().getColor(x, y);
+        out.getPixelWriter().setColor(x, y, colorTransformer.apply(pixelColor, x, y, image));
+      }
     return out;
   }
 
@@ -62,10 +71,9 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
   static void verifyImageBorderIsBorderColorAndCenterIsNot(Image imageToVerify, BorderSpec borderSpec) {
     verifyImagePixels(imageToVerify, (point, image) -> {
       Color pixelColor = image.getPixelReader().getColor(point.x, point.y);
-      if(isWithinImageBorder(point, image, borderSpec.thickness)) {
+      if (isWithinImageBorder(point, image, borderSpec.thickness)) {
         verifyImageBorderPixelColor(borderSpec.color, pixelColor, point);
-      }
-      else {
+      } else {
         verifyNonImageBorderPixelIsNotColor(borderSpec.color, pixelColor, point);
       }
     });
@@ -111,15 +119,15 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   private static void verifyImageBorderPixelColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
     verifyPixelIsColor(expectedBorderColor,
-                       pixelColor,
-                       pixel,
-                       "The color at pixel %d,%d in the image IS within the border but is NOT the border color %s.");
+      pixelColor,
+      pixel,
+      "The color at pixel %d,%d in the image IS within the border but is NOT the border color %s.");
   }
 
-  private static void verifyPixelIsColor(Color expectedBorderColor,
-                                         Color pixelColor,
-                                         Point pixel,
-                                         String errorMessage) {
+  static void verifyPixelIsColor(Color expectedBorderColor,
+                                 Color pixelColor,
+                                 Point pixel,
+                                 String errorMessage) {
     assertEquals(
       String.format(errorMessage, pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
       colorAsRgbString(expectedBorderColor), colorAsRgbString(pixelColor));
@@ -135,15 +143,15 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   private static void verifyNonImageBorderPixelIsNotColor(Color expectedBorderColor, Color pixelColor, Point pixel) {
     verifyPixelIsNotColor(expectedBorderColor,
-                          pixelColor,
-                          pixel,
-                          "The color at pixel %d,%d in the image is NOT within the border but IS the border color %s.");
+      pixelColor,
+      pixel,
+      "The color at pixel %d,%d in the image is NOT within the border but IS the border color %s.");
   }
 
-  private static void verifyPixelIsNotColor(Color expectedBorderColor,
-                                            Color pixelColor,
-                                            Point pixel,
-                                            String errorMessage) {
+  static void verifyPixelIsNotColor(Color expectedBorderColor,
+                                    Color pixelColor,
+                                    Point pixel,
+                                    String errorMessage) {
     assertFalse(
       String.format(errorMessage, pixel.x, pixel.y, colorAsRgbString(expectedBorderColor)),
       expectedBorderColor.equals(pixelColor));
@@ -167,7 +175,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
   }
 
   static ColorTransformer createColorTransformerForBorder(Image originalImage, BorderSpec borderSpec) {
-    return (x,y,color) -> {
+    return (color, x, y, image) -> {
       if (isWithinImageBorder(new Point(x, y), originalImage, borderSpec.thickness)) {
         return borderSpec.color;
       }
@@ -203,26 +211,80 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
   }
 
   static ColorTransformer combineColorTransformers(ColorTransformer... transformers) {
-    return (x, y, color) -> {
+    return (color, x, y, image) -> {
       Color result = color;
       for (ColorTransformer colorTransformer : transformers) {
-        result = colorTransformer.apply(x, y, result);
+        result = colorTransformer.apply(result, x, y, image);
       }
       return result;
     };
   }
 
   static ColorTransformer toColorTransformer(UnaryOperator<Color> brightenOperator) {
-    return (x, y, color) -> brightenOperator.apply(color);
+    return (color, x, y, image) -> brightenOperator.apply(color);
+  }
+
+  static Color blurPixelColor(Color color, int x, int y, Image image) {
+    RgbAccumulation rgbAccumulation = Sets.newHashSet(AdjacentPixel.validValues(new Point(x, y), image)).stream()
+      .map(ap -> ap.getColor(new Point(x, y), image))
+      .map(RgbAccumulation::fromColor)
+      .reduce(RgbAccumulation.fromColor(color), RgbAccumulation::add);
+    return rgbAccumulation.toColor();
+  }
+
+  static void verifyColorsAreEqual(Color pixelColor, Color expectedColor) {
+    assertEquals("Pixel color red element did not match the expected brightened then blurred color.", expectedColor.getRed(), pixelColor.getRed(), 0.01);
+    assertEquals("Pixel color green element did not match the expected brightened then blurred color.", expectedColor.getGreen(), pixelColor.getGreen(), 0.01);
+    assertEquals("Pixel color blue element did not match the expected brightened then blurred color.", expectedColor.getBlue(), pixelColor.getBlue(), 0.01);
+  }
+
+  static enum AdjacentPixel {
+
+    NORTH(0, -1),
+    NORTHEAST(1, -1),
+    EAST(1, -1),
+    SOUTHEAST(1, 1),
+    SOUTH(0, 1),
+    SOUTHWEST(-1, 1),
+    WEST(-1, 0),
+    NORTHWEST(-1, -1);
+
+    private final int relativeX, relativeY;
+
+    private AdjacentPixel(int relativeX, int relativeY) {
+      this.relativeX = relativeX;
+      this.relativeY = relativeY;
+    }
+
+    static Set<AdjacentPixel> validValues(Point pixel, Image image) {
+      return Stream.of(values())
+        .filter(ap -> ap.isValidFor(pixel, image))
+        .collect(Collectors.toCollection(Sets::newHashSet));
+    }
+
+    boolean isValidFor(Point pixel, Image image) {
+      int thisX = pixel.x + relativeX;
+      int thisY = pixel.y + relativeY;
+      return (thisX >= 0 && thisX < image.getWidth()) && (thisY >= 0 && thisY < image.getHeight());
+    }
+
+    Color getColor(Point pixel, Image image) {
+      if(!isValidFor(pixel, image)) {
+        throw new IllegalArgumentException("This adjacent pixel is at a position outside of the image boundary.");
+      }
+
+      return image.getPixelReader().getColor(pixel.x + relativeX, pixel.y + relativeY);
+    }
+
   }
 
   @FunctionalInterface
   static interface ColorTransformer {
-    Color apply(int x, int y, Color colorAtXY);
+    Color apply(Color colorAtXY, int x, int y, Image image);
   }
 
   @FunctionalInterface
-  private interface PixelVerifier {
+  interface PixelVerifier {
     void verify(Point point, Image image);
   }
 
@@ -271,9 +333,9 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
 
   static class LatentImage {
 
-    private final Image in;
-
     private final List<ColorTransformer> pendingOperations = Lists.newArrayList();
+
+    private Image in;
 
     private LatentImage(Image in) {
       this.in = in;
@@ -284,7 +346,7 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
     }
 
     LatentImage transform(UnaryOperator<Color> unaryOperator) {
-      return transform((x, y, color) -> unaryOperator.apply(color));
+      return transform((color, x, y, image) -> unaryOperator.apply(color));
     }
 
     LatentImage transform(ColorTransformer colorTransformer) {
@@ -292,19 +354,88 @@ public class Java8ImpatientLambdasChapter3ExercisesCompanion {
       return this;
     }
 
+    LatentImage transformConvolutionFilter(ColorTransformer colorTransformer) {
+      in = toImage();
+      pendingOperations.clear();
+      return transform(colorTransformer);
+    }
+
     Image toImage() {
       int width = (int) in.getWidth();
       int height = (int) in.getHeight();
       WritableImage out = new WritableImage(width, height);
-      for (int x = 0; x < width; x++)
+      for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-          Color c = in.getPixelReader().getColor(x, y);
+          Color result = in.getPixelReader().getColor(x, y);
           for (ColorTransformer colorTransformer : pendingOperations) {
-            c = colorTransformer.apply(x, y, c);
-            out.getPixelWriter().setColor(x, y, c);
+            result = colorTransformer.apply(result, x, y, in);
           }
+          out.getPixelWriter().setColor(x, y, result);
         }
+      }
       return out;
+    }
+
+  }
+
+  static class RgbAccumulation {
+
+    private final double redAccumulation;
+
+    private final double greenAccumulation;
+
+    private final double blueAccumulation;
+
+    private final int instanceCount;
+
+    private RgbAccumulation(Color color) {
+      this(color.getRed(), color.getGreen(), color.getBlue(), 1);
+    }
+
+    private RgbAccumulation(double redAccumulation,
+                            double greenAccumulation,
+                            double blueAccumulation,
+                            int instanceCount) {
+      this.redAccumulation = redAccumulation;
+      this.greenAccumulation = greenAccumulation;
+      this.blueAccumulation = blueAccumulation;
+      this.instanceCount = instanceCount;
+    }
+
+    static RgbAccumulation fromColor(Color color) {
+      return new RgbAccumulation(color);
+    }
+
+    static RgbAccumulation add(RgbAccumulation... rgbAccumulations) {
+      double redAccumulation = Stream.of(rgbAccumulations).mapToDouble(RgbAccumulation::getRedAccumulation).sum();
+      double greenAccumulation = Stream.of(rgbAccumulations).mapToDouble(RgbAccumulation::getGreenAccumulation).sum();
+      double blueAccumulation = Stream.of(rgbAccumulations).mapToDouble(RgbAccumulation::getBlueAccumulation).sum();
+      int instanceCount = Stream.of(rgbAccumulations).mapToInt(RgbAccumulation::getInstanceCount).sum();
+
+      return new RgbAccumulation(redAccumulation, greenAccumulation, blueAccumulation, instanceCount);
+    }
+
+    Color toColor() {
+      double red = redAccumulation / instanceCount;
+      double green = greenAccumulation / instanceCount;
+      double blue = blueAccumulation / instanceCount;
+      return Color.color(red, green, blue, 1);
+    }
+
+    private double getRedAccumulation() {
+      return redAccumulation;
+    }
+
+    private double getGreenAccumulation() {
+      return greenAccumulation;
+    }
+
+    private double getBlueAccumulation() {
+      return blueAccumulation;
+    }
+
+    public int getInstanceCount() {
+      return instanceCount;
     }
 
   }
