@@ -41,4 +41,12 @@ public class HelloWorldTestCompanion {
 
   }
 
+  static class MessageResponder extends AbstractActor {
+
+    public MessageResponder(String prefixToAdd) {
+      receive(match(Msg.class, m -> sender().tell(createMsg(prefixToAdd + m.getContents()), self())).build());
+    }
+
+  }
+
 }
