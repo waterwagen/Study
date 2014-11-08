@@ -9,14 +9,14 @@ import org.junit.Before;
 import org.junit.Test;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static com.waterwagen.study.akka.HelloWorldTestCompanion.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class HelloWorldTest {
 
@@ -91,6 +91,33 @@ public class HelloWorldTest {
     // then
     assertNotNull("There was no response message!", responseMsg);
     assertEquals("Unexpected response message contents", PREFIX_TO_ADD + msg.getContents(), responseMsg.getContents());
+  }
+
+  @Test
+  public void testSchedulingMessageSends() throws InterruptedException {
+    // given
+    Inbox inbox = Inbox.create(system);
+    ActorRef messageResponder = system.actorOf(Props.create(MessageResponder.class, PREFIX_TO_ADD));
+    Msg msg = createMsg("hey ho");
+    FiniteDuration msgSendInterval = TEN_MILLISECONDS;
+
+
+    // when
+    system.scheduler().schedule(immediately(),
+                                msgSendInterval,
+                                messageResponder,
+                                msg,
+                                system.dispatcher(),
+                                inbox.getRef());
+
+    // then
+    long messageSendPeriodLength = 500L;
+    Thread.sleep(messageSendPeriodLength);
+
+    Queue<Msg> msgsReceived = receiveMsgs(inbox);
+    long minimumMessagesExpected = messageSendPeriodLength / msgSendInterval.toMillis();
+    assertTrue(String.format("Expected at least %d messages to be received but received %d", minimumMessagesExpected, msgsReceived.size()),
+      msgsReceived.size() >= minimumMessagesExpected);
   }
 
 }
