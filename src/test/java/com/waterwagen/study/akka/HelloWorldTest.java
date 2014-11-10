@@ -4,9 +4,12 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Inbox;
 import akka.actor.Props;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Queue;
@@ -118,6 +121,22 @@ public class HelloWorldTest {
     long minimumMessagesExpected = messageSendPeriodLength / msgSendInterval.toMillis();
     assertTrue(String.format("Expected at least %d messages to be received but received %d", minimumMessagesExpected, msgsReceived.size()),
       msgsReceived.size() >= minimumMessagesExpected);
+  }
+
+  @Test
+  public void testAskingForAFuture() throws InterruptedException {
+    // given
+    ActorRef messageResponder = system.actorOf(Props.create(MessageResponder.class, PREFIX_TO_ADD));
+    Msg msg = createMsg("hippity hop");
+
+    // when
+    Future<Object> response = Patterns.ask(messageResponder, msg, Timeout.durationToTimeout(TEN_MILLISECONDS));
+
+    // then
+    while(!response.isCompleted()) { Thread.sleep(50L); };
+    Msg responseMsg = response.value().get().getOrElse(null);
+    assertNotNull("There was no response message!", responseMsg);
+    assertEquals("Unexpected response message contents", PREFIX_TO_ADD + msg.getContents(), responseMsg.getContents());
   }
 
 }
