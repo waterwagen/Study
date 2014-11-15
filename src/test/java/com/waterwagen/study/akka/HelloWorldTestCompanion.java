@@ -16,10 +16,12 @@ import static akka.japi.pf.ReceiveBuilder.match;
 
 public class HelloWorldTestCompanion {
 
-  public static final FiniteDuration NO_TIME = Duration.Zero();
+  static final FiniteDuration NO_TIME = Duration.Zero();
+
   static final String TEST_ACTOR_SYSTEM_NAME = "testActorSystem";
 
   static final String PREFIX_TO_ADD = "RANDOM_PREFIX: ";
+
   static final FiniteDuration TEN_MILLISECONDS = Duration.create(10, TimeUnit.MILLISECONDS);
 
   static Msg createMsg(final String msgContents) {
