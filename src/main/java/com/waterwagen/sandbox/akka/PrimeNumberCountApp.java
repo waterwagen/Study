@@ -11,6 +11,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static akka.japi.pf.ReceiveBuilder.match;
 
+// Improve this app by:
+// - Doing a better/smarter job of sending work to the child prime number calculators instead of work getting stacked
+// up in one which is taking a long time to finish a calculation. The parent should probably be doing a better job of
+// actually supervising and should probably be handling what to do with the results.
+// - Also, look into adding a database and saving events to it (event sourcing).
+// - Add tests.
+// - Add logging.
 public class PrimeNumberCountApp {
 
   private static final String USER_PROMPT = "Enter a result to calculate: ";
