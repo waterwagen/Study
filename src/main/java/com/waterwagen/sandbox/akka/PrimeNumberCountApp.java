@@ -27,7 +27,7 @@ public class PrimeNumberCountApp {
     ActorRef primeNumberCalculatorSupervisor = createPrimeNumberCalculatorSupervisorActor(actorSystem);
     createResultProcessorActor(actorSystem);
 
-    //  open up standard input
+    //  Read input from the user and calculate the prime number count
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     try {
       String input = readInput(br);
