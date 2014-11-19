@@ -1,20 +1,28 @@
 package com.waterwagen.sandbox.akka;
 
 import akka.actor.*;
-import com.google.common.collect.Lists;
+import akka.routing.*;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import scala.collection.JavaConversions;
+import scala.collection.immutable.IndexedSeq;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static akka.japi.pf.ReceiveBuilder.match;
 
 // Improve this app by:
-// - Doing a better/smarter job of sending work to the child prime number calculators instead of work getting stacked
-// up in one which is taking a long time to finish a calculation. The parent should probably be doing a better job of
-// actually supervising and should probably be handling what to do with the results.
+// - add caching of previous calculated values in the Actor. Use the Guava cache.
+// - add support in the supervisor actor for handling errors in a child actor?
 // - Also, look into adding a database and saving events to it (event sourcing).
 // - Add tests.
 // - Add logging.
@@ -76,28 +84,116 @@ public class PrimeNumberCountApp {
 
     private static final String BASE_PRIME_NUMBER_CALCULATOR_ACTOR_NAME = "prime-result-calculator-actor-";
 
-    private final List<ActorRef> primeNumberCalculators;
+    private final Router workerActorRouter;
 
-    private int nextCalculatorCounter = 0;
+    private final ActorSelection resultProcessorActor;
 
     public PrimeNumberCalculatorSupervisor(String resultProcessorActorName) {
-      primeNumberCalculators =
-        Lists.newArrayList(createPrimeNumberCalculatorActor(context().system(), resultProcessorActorName, 1),
-                           createPrimeNumberCalculatorActor(context().system(), resultProcessorActorName, 2),
-                           createPrimeNumberCalculatorActor(context().system(), resultProcessorActorName, 3));
-      receive(match(PrimeNumberCalculationRequestMsg.class, this::processMessage).build());
+      resultProcessorActor = createActorWhichProcessesResult(resultProcessorActorName);
+      workerActorRouter = createRouterWithWorkerActorsToRunCalculations();
+      configureMessageHandling();
     }
 
-    private static ActorRef createPrimeNumberCalculatorActor(ActorSystem actorSystem,
-                                                             String resultProcessorActorName,
-                                                             int id) {
-      Props primeNumberCalculatorProps = Props.create(PrimeNumberCalculator.class, resultProcessorActorName);
+    private ActorSelection createActorWhichProcessesResult(String resultProcessorActorName) {
+      return context().system().actorSelection("/user/" + resultProcessorActorName);
+    }
+
+    private Router createRouterWithWorkerActorsToRunCalculations() {
+      Set<Routee> quickResponseRoutees = createQuickResponseActorsAsRoutees();
+      Set<Routee> longRunningRoutees = createLongRunningActorsAsRoutees();
+      List<Routee> supervisedPrimeNumberCalculators = createListFromAll(quickResponseRoutees, longRunningRoutees);
+      PrimeNumberCalculationRoutingLogic primeNumberCalculatorRoutingLogic =
+        new PrimeNumberCalculationRoutingLogic(quickResponseRoutees, longRunningRoutees);
+
+      return new Router(primeNumberCalculatorRoutingLogic, supervisedPrimeNumberCalculators);
+    }
+
+    private ImmutableSet<Routee> createQuickResponseActorsAsRoutees() {
+      return ImmutableSet.of(wrapActorAsRoutee(createPrimeNumberCalculatorActor("quickresponse")));
+    }
+
+    private ImmutableSet<Routee> createLongRunningActorsAsRoutees() {
+      return ImmutableSet.of(wrapActorAsRoutee(createPrimeNumberCalculatorActor("longrunning-1")),
+          wrapActorAsRoutee(createPrimeNumberCalculatorActor("longrunning-2")));
+    }
+
+    private static ImmutableList<Routee> createListFromAll(Collection<Routee>... routeeCollections) {
+      ImmutableList.Builder<Routee> listBuilder = ImmutableList.<Routee>builder();
+      for(Collection<Routee> routees : routeeCollections) {
+        listBuilder.addAll(routees);
+      }
+      return listBuilder.build();
+    }
+
+    private ActorRef createPrimeNumberCalculatorActor(String id) {
+      Props primeNumberCalculatorProps = Props.create(PrimeNumberCalculator.class);
       String primeNumberCalculatorName = BASE_PRIME_NUMBER_CALCULATOR_ACTOR_NAME + id;
-      return actorSystem.actorOf(primeNumberCalculatorProps, primeNumberCalculatorName);
+      return context().system().actorOf(primeNumberCalculatorProps, primeNumberCalculatorName);
     }
 
-    private void processMessage(PrimeNumberCalculationRequestMsg msg) {
-      primeNumberCalculators.get(nextCalculatorCounter++ % primeNumberCalculators.size()).tell(msg, self());
+    private static Routee wrapActorAsRoutee(ActorRef actor) {
+      return new ActorRefRoutee(actor);
+    }
+
+    private void configureMessageHandling() {
+      receive(match(PrimeNumberCalculationRequestMsg.class, this::processRequestMessage).
+              match(PrimeNumberCalculationResultMsg.class, this::processResultMessage).build());
+    }
+
+    private void processRequestMessage(PrimeNumberCalculationRequestMsg msg) {
+      workerActorRouter.route(msg, self());
+    }
+
+    private void processResultMessage(PrimeNumberCalculationResultMsg msg) {
+      resultProcessorActor.tell(msg, self());
+    }
+
+    private static class PrimeNumberCalculationRoutingLogic implements RoutingLogic {
+
+      private final SmallestMailboxRoutingLogic smallestMailboxRoutingLogic;
+
+      private final Map<RouteeType, IndexedSeq<Routee>> routeeTypeToRouteesMap;
+
+      private PrimeNumberCalculationRoutingLogic(Set<Routee> quickResponseWorkers, Set<Routee> longRunningWorkers) {
+        smallestMailboxRoutingLogic = new SmallestMailboxRoutingLogic();
+        routeeTypeToRouteesMap = Maps.newHashMap();
+        routeeTypeToRouteesMap.put(RouteeType.QUICK_RESPONSE, toIndexedSeq(quickResponseWorkers));
+        routeeTypeToRouteesMap.put(RouteeType.LONG_RUNNING, toIndexedSeq(longRunningWorkers));
+      }
+
+      private static <T> IndexedSeq<T> toIndexedSeq(Collection<T> routees) {
+        return JavaConversions.asScalaIterator(routees.iterator()).toIndexedSeq();
+      }
+
+      @Override
+      public Routee select(Object message, IndexedSeq<Routee> routees) {
+        Preconditions.checkArgument(message instanceof PrimeNumberCalculationRequestMsg,
+                                    unexpectedRouterMessageTypeMessage(message));
+
+        PrimeNumberCalculationRequestMsg messageToRoute = (PrimeNumberCalculationRequestMsg) message;
+
+        // choose routee based on the size of the prime number in the request. Requests for number <= 10^5 should go to
+        // the quick response routee(s)/actor(s). The other requests should route between the long-running request
+        // routee(s)/actor(s).
+        RouteeType messageRouteeType = RouteeType.forPrimeNumberCalculationOf(messageToRoute.number);
+        IndexedSeq<Routee> applicableRoutees = routeeTypeToRouteesMap.get(messageRouteeType);
+        return smallestMailboxRoutingLogic.select(message, applicableRoutees);
+      }
+
+      private static enum RouteeType {
+        QUICK_RESPONSE, LONG_RUNNING;
+
+        private static RouteeType forPrimeNumberCalculationOf(long number) {
+          return number <= 10*10*10*10*10 ? QUICK_RESPONSE : LONG_RUNNING;
+        }
+      }
+
+      private static String unexpectedRouterMessageTypeMessage(Object message) {
+        String messageTemplate =
+          "Unexpected message type to be routed. Expected PrimeNumberCalculationRequestMsg but was %s";
+        return String.format(messageTemplate, message.getClass().getName());
+      }
+
     }
 
   }
@@ -114,16 +210,13 @@ public class PrimeNumberCountApp {
 
   private static class PrimeNumberCalculator extends AbstractActor {
 
-    private ActorSelection resultProcessorActor;
-
-    public PrimeNumberCalculator(String resultProcessorActorName) {
-      resultProcessorActor = context().system().actorSelection("/user/" + resultProcessorActorName);
+    public PrimeNumberCalculator() {
       receive(match(PrimeNumberCalculationRequestMsg.class, this::processMessage).build());
     }
 
     private void processMessage(PrimeNumberCalculationRequestMsg msg) {
       int primeNumberCount = calculateCount(msg.number);
-      resultProcessorActor.tell(new PrimeNumberCalculationResultMsg(msg.number, primeNumberCount), self());
+      sender().tell(new PrimeNumberCalculationResultMsg(msg.number, primeNumberCount), self());
     }
 
     private static int calculateCount(long number) {
