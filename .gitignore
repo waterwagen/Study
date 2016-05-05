@@ -1,4 +1,8 @@
+.gitignore
 .idea/
 build/
 Study.iml
+.gradle/
+.swp
+.swo
 
